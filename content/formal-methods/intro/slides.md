@@ -1,295 +1,250 @@
 ---
 title: Introduction to Formal Methods for Rust
-description: Introductory lesson on formal methods for Rust verification
 duration: 60 minutes
+description: Introductory lesson on formal methods for Rust verification
 ---
 
 # Introduction to Formal Methods for Rust
 
----
+***
 
 ## Outline
 
-<pba-flex center>
-
 1. Intro to Formal Methods
-1. Landscape of Techniques for Rust
-1. Focus on Kani: Bounded Model Checker
-1. Applications to Substrate
+2. Landscape of Techniques for Rust
+3. Focus on Kani: Bounded Model Checker
+4. Applications to Substrate
 
-</pba-flex>
-
----
+***
 
 ## Introduction to Formal Methods
 
 #### _Story Time!_
 
----v
+\---v
 
 ### _Ariane 5 Rocket - Flight 501_
 
-<img rounded style="width: 400px" src="./img/ariane.jpg" />
+![](img/ariane.jpg)
 
-- in **1996**, the launcher rocket disintegrated 39 secs after take-off.
-- **Failure**: An _overflow_, caused by a conversion from 64-bit to 16-bit floating point
-- **Mistake**: reusing inertial reference platform of Ariane-4, where overflow cannot happen due to different operational conditions
-- **Cost**: `$`500M payload, `$`8B development program
+* in **1996**, the launcher rocket disintegrated 39 secs after take-off.
+* **Failure**: An _overflow_, caused by a conversion from 64-bit to 16-bit floating point
+* **Mistake**: reusing inertial reference platform of Ariane-4, where overflow cannot happen due to different operational conditions
+* **Cost**: `$`500M payload, `$`8B development program
 
 Notes:
 
-Link to article: (https://www-users.cse.umn.edu/~arnold/disasters/ariane.html)
+Link to article: (https://www-users.cse.umn.edu/\~arnold/disasters/ariane.html)
 
----v
+\---v
 
 ## Software Correctness is _very_ important
 
-> Program testing can be used to show the presence of bugs,<br />but never to show their absence!
+> Program testing can be used to show the presence of bugs,\
+> but never to show their absence!
 >
-> --Edgard Dijkstra--
+> \--Edgard Dijkstra--
 
-**_Hence, the necessity to go beyond testing_** <!-- .element: class="fragment" -->
+_**Hence, the necessity to go beyond testing**_
 
----v
+\---v
 
 ## Formal Methods to the Rescue!
 
-- Given a system (code) and Specification (behavior), verify/prove correctness with reasonable mathematical guarantees.
-- **Traditionally**, costs and efforts were justifiable in _safety-critical_ software like avionics, nuclear reactors, medical imaging, etc.
-- however, things have changed ...
+* Given a system (code) and Specification (behavior), verify/prove correctness with reasonable mathematical guarantees.
+* **Traditionally**, costs and efforts were justifiable in _safety-critical_ software like avionics, nuclear reactors, medical imaging, etc.
+* however, things have changed ...
 
 Notes:
 
 this is how Formal Methods were motivated; to prove the absence of Bugs! A bit of fear-mongering in my opinion.
 
----v
+\---v
 
 ## It is no longer Rocket Science!
 
-- AWS formally verifies Key-Value storage nodes in Amazon S3 (Rust Implementation).
-- Meta detects resource leaks and race conditions in Android apps
-- Uber uses static analysis to find Null-pointer exceptions
-- Ethereum's Beacon chain and Tendermint consensus formally verified for safety and liveness guarantees
+* AWS formally verifies Key-Value storage nodes in Amazon S3 (Rust Implementation).
+* Meta detects resource leaks and race conditions in Android apps
+* Uber uses static analysis to find Null-pointer exceptions
+* Ethereum's Beacon chain and Tendermint consensus formally verified for safety and liveness guarantees
 
 Notes:
 
-- Personally think of formal methods as a more systematic way of detecting bugs.
-- Ideally, verifying if your property holds on all possible inputs.
+* Personally think of formal methods as a more systematic way of detecting bugs.
+* Ideally, verifying if your property holds on all possible inputs.
 
----v
+\---v
 
 ## Formal Methods Today
 
-From being theoretical research interests<br /> to delivering practical cost-effective tools
+From being theoretical research interests\
+to delivering practical cost-effective tools
 
-<pba-flex center>
-
-- goals more focused, promises less lofty
-- verification tools more efficient
-- combination of analysis techniques
-
-</pba-flex>
+* goals more focused, promises less lofty
+* verification tools more efficient
+* combination of analysis techniques
 
 Notes:
 
-- Limiting attention to a particular class of bugs, resource leaks, data-races, etc.
-- Drastic Speed-up in Underlying Constraint-Solver engines.
+* Limiting attention to a particular class of bugs, resource leaks, data-races, etc.
+* Drastic Speed-up in Underlying Constraint-Solver engines.\
   For example, Z3 by microsoft, can solve constraints with billions of variables.
-- Unified theory with blurring lines; Combining both static and dynamic techniques.
+* Unified theory with blurring lines; Combining both static and dynamic techniques.
 
----v
+\---v
 
 ## More like _Light-weight Formal Methods_
 
 1. Rigorously **detecting bugs** → proving overall correctness of system.
-1. Developer-centric **Usability** (e.g. workflow integration)
+2. Developer-centric **Usability** (e.g. workflow integration)
 
 Notes:
 
-- Realized the importance of Developer experience.
-- No more obscure logic that the developer has to learn to write specifications.
-- You will see how intuitive it is to verify code.
+* Realized the importance of Developer experience.
+* No more obscure logic that the developer has to learn to write specifications.
+* You will see how intuitive it is to verify code.
 
----v
+\---v
 
 ## Formal Methods ↔ Blockchains
 
 **Hammer finally found the nail!**
 
-- Lot at stake, justifies the cost and efforts
-- Business logic is compact and modular, within limits
+* Lot at stake, justifies the cost and efforts
+* Business logic is compact and modular, within limits
 
 Note:
 
-- Reputation along with money at stake.
-- A simple android app has 100k java classes.
+* Reputation along with money at stake.
+* A simple android app has 100k java classes.\
   Techniques are not scalable on large codebases.
-- Complexity of runtime business logic is magnitude lower.
+* Complexity of runtime business logic is magnitude lower.\
   Lot of interest in Smart Contract verification.
-- Check out Certora, Echidna, Securify, and more [here](https://ethereum.org/en/developers/docs/smart-contracts/formal-verification/)
+* Check out Certora, Echidna, Securify, and more [here](https://ethereum.org/en/developers/docs/smart-contracts/formal-verification/)
 
----v
+\---v
 
 ## Key Takeaways
 
-<pba-flex center>
+_**Formal Methods are...**_
 
-**_Formal Methods are..._**
-
-- **Not a Panacea** but can improve software quality
-- Getting more and more **accessible**
-- Useful for increasing **reliability and security** of blockchains
-  </pba-flex>
+* **Not a Panacea** but can improve software quality
+* Getting more and more **accessible**
+* Useful for increasing **reliability and security** of blockchains
 
 Notes:
 
-- [Great blog](https://web.archive.org/web/20230209000724/www.pl-enthusiast.net/2017/10/23/what-is-soundness-in-static-analysis/) that explains the trade-offs between soundness and tractability
+* [Great blog](https://web.archive.org/web/20230209000724/www.pl-enthusiast.net/2017/10/23/what-is-soundness-in-static-analysis/) that explains the trade-offs between soundness and tractability
 
----
+***
 
-<!-- .slide: data-background-color="#4A2439" -->
+### Tools Landscape
 
-## Tools Landscape
-
-<img style="width: 700px" src="./img/Landscape.svg"/>
+![](img/Landscape.svg)
 
 Notes:
 
 Links to listed tools
 
-- [Isabelle](https://isabelle.in.tum.de/)
-- [Coq](https://coq.inria.fr/)
-- [TLA+](https://github.com/tlaplus)
-- [StateRight](https://github.com/stateright/stateright)
-- [Prusti](https://www.pm.inf.ethz.ch/research/prusti.html)
-- [Kani](https://github.com/model-checking/kani)
-- [MIRAI](https://github.com/facebookexperimental/MIRAI)
-- [Flowistry](https://github.com/willcrichton/flowistry)
-- [Substrace](https://github.com/kaiserkarel/substrace)
-- [Clippy](https://github.com/rust-lang/rust-clippy)
+* [Isabelle](https://isabelle.in.tum.de/)
+* [Coq](https://coq.inria.fr/)
+* [TLA+](https://github.com/tlaplus)
+* [StateRight](https://github.com/stateright/stateright)
+* [Prusti](https://www.pm.inf.ethz.ch/research/prusti.html)
+* [Kani](https://github.com/model-checking/kani)
+* [MIRAI](https://github.com/facebookexperimental/MIRAI)
+* [Flowistry](https://github.com/willcrichton/flowistry)
+* [Substrace](https://github.com/kaiserkarel/substrace)
+* [Clippy](https://github.com/rust-lang/rust-clippy)
 
----v
+\---v
 
-## Tools Landscape
+### Tools Landscape
 
-<pba-cols>
-<pba-col center>
+![](img/Landscape.svg)
 
-<img style="width: 700px" src="./img/Landscape.svg"/>
+**Quint/ State-Right (Model-checkers)**
 
-</pba-col>
-
-<pba-col center>
-
-#### Quint/ State-Right (Model-checkers)
-
-- Humongous effort modelling the system & specifying properties
-- Abstraction gap
-- Reason about complex properties: safety & liveness of consensus mechanism
-
-</pba-col>
-</pba-cols>
+* Humongous effort modelling the system & specifying properties
+* Abstraction gap
+* Reason about complex properties: safety & liveness of consensus mechanism
 
 Notes:
 
-- Design-level, verifying protocol design.
-- Always a discrepancy in your model and actual code.
-- Safety: nothing bad ever happens; no two honest nodes agree on different state
-- Liveness: something good eventually happens; eventually 2/3rds reach consensus
+* Design-level, verifying protocol design.
+* Always a discrepancy in your model and actual code.
+* Safety: nothing bad ever happens; no two honest nodes agree on different state
+* Liveness: something good eventually happens; eventually 2/3rds reach consensus
 
----v
+\---v
 
-## Tools Landscape
+### Tools Landscape
 
-<pba-cols>
-<pba-col center>
+![](img/Landscape.svg)
 
-<img style="width: 700px" src="./img/Landscape.svg"/>
+**Static Analyzers**
 
-</pba-col>
-
-<pba-col center>
-
-#### Static Analyzers
-
-- Code-level
-- Information/ dataflow properties; access control for code;
-- Specify expected behavior (properties).
+* Code-level
+* Information/ dataflow properties; access control for code;
+* Specify expected behavior (properties).\
   Roundtrip property: decode (encode (x)) == x
-- Default checks: bugs like arithmetic overflow, out-of-bound access panics
-
-</pba-col>
-</pba-cols>
+* Default checks: bugs like arithmetic overflow, out-of-bound access panics
 
 Notes:
 
-- Eg. for code access control: ensure that certain sensitive parts of runtime are only accessible by Root origin
-- MIRAI is developed by Meta uses technique called abstract interpretation;
+* Eg. for code access control: ensure that certain sensitive parts of runtime are only accessible by Root origin
+* MIRAI is developed by Meta uses technique called abstract interpretation;\
   specifically useful for detecting panics statically and information flow properties
-- Kani: we will dive deeper soon
+* Kani: we will dive deeper soon
 
----v
+\---v
 
-## Tools Landscape
+### Tools Landscape
 
-<pba-cols>
-<pba-col center>
+![](img/Landscape.svg)
 
-<img style="width: 700px" src="./img/Landscape.svg"/>
+**Linters**
 
-</pba-col>
-
-<pba-col center>
-
-#### Linters
-
-- Code-level
-- Checks for code smells
-- Other syntactic Properties
-
-</pba-col>
-</pba-cols>
+* Code-level
+* Checks for code smells
+* Other syntactic Properties
 
 Notes:
 
-- [Substrace](https://github.com/KaiserKarel/substrace) is a linter specifically for Substrate
-- Flowistry allows you to track dependency between variables; slices only the relevant portion for a given location.
+* [Substrace](https://github.com/KaiserKarel/substrace) is a linter specifically for Substrate
+* Flowistry allows you to track dependency between variables; slices only the relevant portion for a given location.
 
----
+***
 
-<!-- .slide: data-background-color="#4A2439" -->
+## Our Focus: [Kani](https://github.com/model-checking/kani)
 
-# Our Focus: [Kani](https://github.com/model-checking/kani)
+***
 
----
+### Kani: Model Checking tool for Rust
 
-## Kani: Model Checking tool for Rust
-
-- [Open-source Rust verifier](https://github.com/model-checking/kani) by AWS
-- Underlying technique used: Bounded Model Checking
-- Can be used to _prove_:
-  - Absence of arithmetic overflows
-  - Absence of runtime errors (index out of bounds, panics)
-  - User Specified Properties (enhanced PropTesting)
-  - Memory safety when using unsafe Rust
-- Provides a concrete test-case triggering the bug if verification fails
+* [Open-source Rust verifier](https://github.com/model-checking/kani) by AWS
+* Underlying technique used: Bounded Model Checking
+* Can be used to _prove_:
+  * Absence of arithmetic overflows
+  * Absence of runtime errors (index out of bounds, panics)
+  * User Specified Properties (enhanced PropTesting)
+  * Memory safety when using unsafe Rust
+* Provides a concrete test-case triggering the bug if verification fails
 
 Notes:
 
-Link to Bounded Model Checking paper for interested folks [here](https://www.cs.cmu.edu/~emc/papers/Books%20and%20Edited%20Volumes/Bounded%20Model%20Checking.pdf).
+Link to Bounded Model Checking paper for interested folks [here](https://www.cs.cmu.edu/~emc/papers/Books%20and%20Edited%20Volumes/Bounded%20Model%20Checking.pdf).\
 For example when you are accessing/modifying mutable static variable
 
----v
+\---v
 
-### _Lets see some Magic first_
+#### _Lets see some Magic first_
 
 > Demo of the Rectangle-Example
 
----v
+\---v
 
-## Proof Harness
-
-<pba-col centre>
+### Proof Harness
 
 ```rust
 use my_crate::{function_under_test, meets_specification, precondition};
@@ -310,19 +265,12 @@ fn check_my_property() {
 }
 ```
 
-<!-- .element: style="font-size:0.62em"-->
+* Kani tries to prove that all valid inputs produce outputs that meet specifications, without panicking.
+* Else, Kani generates a trace that points to the failure.
 
-- Kani tries to prove that all valid inputs produce outputs that meet specifications, without panicking.
-- Else, Kani generates a trace that points to the failure.
-
-</pba-col>
-
----v
+\---v
 
 Property: `decode(encode(x)) == x`
-
-<pba-cols>
-<pba-col center>
 
 Test
 
@@ -337,10 +285,6 @@ fn test_u32 {
 
 fixed value `42`
 
-</pba-col>
-
-<pba-col center>
-
 Fuzzing
 
 ```rust
@@ -353,11 +297,6 @@ fuzz_target!(|data: &[u8]|) {
 ```
 
 multiple random values of `u16`
-
-</pba-col>
-</pba-cols>
-
-<pba-col center>
 
 Kani Proof
 
@@ -372,36 +311,31 @@ fn proof_u32_roundtrip {
 ```
 
 verifies exhaustively all values of `u16`
-</pba-col>
 
----v
+\---v
 
-### Under the Hood: Bounded Model Checking
+#### Under the Hood: Bounded Model Checking
 
-#### Idea:
+**Idea:**
 
-- Search for counterexamples in (bounded) executions paths
-- However, this search is an NP-hard problem
+* Search for counterexamples in (bounded) executions paths
+* However, this search is an NP-hard problem
 
-#### Method:
+**Method:**
 
-- Efficiently reduce problem to a Constraint Satisfaction (SAT) problem
-- verification reduced to problem of searching satisfiable assignment to a SAT formula.
-- leverages highly optimized SAT solvers making the search tractable.
+* Efficiently reduce problem to a Constraint Satisfaction (SAT) problem
+* verification reduced to problem of searching satisfiable assignment to a SAT formula.
+* leverages highly optimized SAT solvers making the search tractable.
 
 Notes:
 
 Kani uses miniSAT as the backend engine; a lot of other verification tools use Z3 solver.
 
----v
+\---v
 
-### Translation to constraints
+#### Translation to constraints
 
-<pba-cols>
-
-<pba-col centre>
-
-#### Code
+**Code**
 
 ```rust
 fn foo(x: i32) -> i32 {
@@ -418,11 +352,7 @@ fn foo(x: i32) -> i32 {
 }
 ```
 
-</pba-col>
-
-<pba-col centre>
-
-#### Constraints
+**Constraints**
 
 ```rust
 y = 8,
@@ -431,26 +361,21 @@ w = x? y+1: 0,
 z != 7 /\ w != 9 (negation of the assert condition)
 ```
 
-- Constraints fed into a Solver (minisat)
-- For no value of `x` the constraints hold $\implies$ Assert conditions verified
-- Else the solver found a failing test (counterexample)
+* Constraints fed into a Solver (minisat)
+* For no value of `x` the constraints hold $\implies$ Assert conditions verified
+* Else the solver found a failing test (counterexample)
 
-<!-- show the number of clauses and variables used in the formula in the demo-->
+\---v
 
-</pba-col>
-</pba-cols>
+### How does it handle loops?
 
----v
+* _Bounded_ in BMC to the rescue!
+* Loops are unwound up to a certain bounded depth $k$, else the verification does not terminate.
+* Determining the _sweet-spot_ $k$ is a trade-off between _tractability_ and _verification confidence_ .
 
-## How does it handle loops?
+\---v
 
-- _Bounded_ in BMC to the rescue!
-- Loops are unwound up to a certain bounded depth $k$, else the verification does not terminate.
-- Determining the _sweet-spot_ $k$ is a trade-off between _tractability_ and _verification confidence_ .
-
----v
-
-## Demo: Unwinding Loops
+### Demo: Unwinding Loops
 
 ```rust
 fn initialize_prefix(length: usize, buffer: &mut [u8]) {
@@ -478,23 +403,21 @@ fn check_initialize_prefix() {
 }
 ```
 
-<!-- .element: style="font-size:0.62em"-->
+\---v
 
----v
-
-## Dealing with Loops: Summary
+### Dealing with Loops: Summary
 
 **Process:**
 
-- Start with unwinding $k$ times
-- If no bug is found, increase $k$ until either:
-  - A bug is found
-  - verifier times-out
-  - predetermined upper-bound $N$ for $k$ is reached
+* Start with unwinding $k$ times
+* If no bug is found, increase $k$ until either:
+  * A bug is found
+  * verifier times-out
+  * predetermined upper-bound $N$ for $k$ is reached
 
----v
+\---v
 
-## Implementing Arbitrary for custom type
+### Implementing Arbitrary for custom type
 
 ```rust
 use arbitrary::{Arbitrary, Result, Unstructured};
@@ -516,36 +439,36 @@ impl<'a> Arbitrary<'a> for Rgb {
 }
 ```
 
----
+***
 
-## Exercise
+### Exercise
 
 > Verify [Fixed-width](https://github.com/paritytech/parity-scale-codec/blob/master/src/codec.rs) & [Compact](https://github.com/paritytech/parity-scale-codec/blob/master/src/compact.rs) Encoding for integer types in SCALE.
 
-<br />
-<br />
+\
+\
+
 
 **Open Ended properties!**
 
-- _RoundTrip_: `Decode (Encode (x)) == x`
-- `DecodeLength(x) == Decode(x).length()`
-- `EncodeAppend(vec,item) == Encode(vec.append(item))`
-- ......
+* _RoundTrip_: `Decode (Encode (x)) == x`
+* `DecodeLength(x) == Decode(x).length()`
+* `EncodeAppend(vec,item) == Encode(vec.append(item))`
+* ......
 
 Notes:
 
-- Potentially, we might play around with a few of these properties during a workshop this weekend.
+* Potentially, we might play around with a few of these properties during a workshop this weekend.
 
----
+***
 
-<!-- .slide: data-background-color="#4A2439" -->
+## More Verification
 
-# More Verification
+## Less Bugs
 
-# Less Bugs
+\
+\
+\
 
-<br />
-<br />
-<br />
 
-**_Questions_**
+_**Questions**_

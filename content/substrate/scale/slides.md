@@ -1,18 +1,18 @@
 ---
 title: SCALE Codec
-description: SCALE Codec for web3 builders
 duration: 1 hour
+description: SCALE Codec for web3 builders
 ---
 
 # SCALE Codec
 
----
+***
 
 ## SCALE Codec
 
 At the end of this lecture, you will learn why Substrate uses SCALE codec, how all different kinds of data types are encoded.
 
----
+***
 
 ### SCALE
 
@@ -20,7 +20,7 @@ Simple Concatenated Aggregate Little-Endian
 
 SCALE is a light-weight format which allows encoding (and decoding) which makes it highly suitable for resource-constrained execution environments like blockchain runtimes and low-power, low-memory devices.
 
----
+***
 
 ### Little-Endian
 
@@ -28,34 +28,22 @@ Little endian systems store the least significant byte at the smallest memory ad
 
 Wasm is a little endian system, which makes SCALE very performant.
 
-<pba-cols>
-<pba-col center>
+![](img/Big-Endian.svg)![](img/Little-Endian.svg)
 
-<img src="./img/Big-Endian.svg" style="background-color: white; border-radius: 10%; border: 5px solid red;" />
-
-</pba-col>
-
-<pba-col center>
-
-<img src="./img/Little-Endian.svg" style="background-color: white; border-radius: 10%; border: 5px solid green;" />
-
-</pba-col>
-</pba-cols>
-
----
+***
 
 ### Why SCALE? Why not X?
 
-- Simple to define.
-- Not Rust-specific (but happens to work great in Rust).
-  - Easy to derive codec logic: `#[derive(Encode, Decode)]`
-  - Viable and useful for APIs like: `MaxEncodedLen` and `TypeInfo`
-  - It does not use Rust `std`, and thus can compile to Wasm `no_std`.
-- Consensus critical / bijective; one value will always encode to one blob and that blob will only decode to that value.
-- Supports a copy-free decode for basic types on LE architectures.
-- It is about as thin and lightweight as can be.
+* Simple to define.
+* Not Rust-specific (but happens to work great in Rust).
+  * Easy to derive codec logic: `#[derive(Encode, Decode)]`
+  * Viable and useful for APIs like: `MaxEncodedLen` and `TypeInfo`
+  * It does not use Rust `std`, and thus can compile to Wasm `no_std`.
+* Consensus critical / bijective; one value will always encode to one blob and that blob will only decode to that value.
+* Supports a copy-free decode for basic types on LE architectures.
+* It is about as thin and lightweight as can be.
 
----
+***
 
 ### SCALE is NOT Self-Descriptive
 
@@ -63,12 +51,9 @@ It is important to note that the encoding context (knowledge of how the types an
 
 The encoded data does not include this contextual information.
 
----
+***
 
 ### Example: SCALE vs JSON
-
-<div class="flex-container text-smaller">
-<div class="left">
 
 ```rust
 use parity_scale_codec::{ Encode };
@@ -96,9 +81,6 @@ fn main() {
 7
 ```
 
-</div>
-<div class="right" style="margin-left: 10px;">
-
 ```rust
 use serde::{ Serialize };
 
@@ -125,10 +107,7 @@ fn main() {
 42
 ```
 
-</div>
-</div>
-
----
+***
 
 ### Try It Yourself!
 
@@ -139,7 +118,7 @@ cargo init
 cargo add parity-scale-codec --features derive
 ```
 
----
+***
 
 ### Little vs Big Endian Output
 
@@ -148,9 +127,6 @@ It can be confusing to read the output, and keep in mind endianness.
 The order of bytes in the vector follow endianness, but the hex and binary representation of each byte is the same, and independent of endianness.
 
 `0b` prefix denotes a binary representation, and `0x` denotes a hex representation.
-
-<pba-cols>
-<pba-col center>
 
 ```rust
 fn main() {
@@ -166,10 +142,6 @@ fn main() {
 }
 ```
 
-</pba-col>
-
-<pba-col center style="margin-left: 10px;">
-
 ```sh
 1000101
 [45]
@@ -182,10 +154,7 @@ fn main() {
 [00, ff, ff, ff]
 ```
 
-</pba-col>
-</pba-cols>
-
----
+***
 
 ### Fixed Width Integers
 
@@ -213,7 +182,7 @@ Notes:
 
 notice the first two being the same. SCALE IS NOT DESCRIPTIVE of the type. The decoder is responsible for decoding this into some 1 byte-width type, be it u8 or i8 or something else.
 
----
+***
 
 ### Compact Integers
 
@@ -221,22 +190,17 @@ A "compact" or general integer encoding is sufficient for encoding large integer
 
 Though for single-byte values, the fixed-width integer is never worse.
 
----
+***
 
 ### Compact Prefix
 
-<div class="text-small">
-
-<!-- prettier-ignore -->
-| `0b00` | `0b01` | `0b10` | `0b11` |
-| ------ | ------ | ------ | ------ |
-| single-byte mode; upper six bits are the LE encoding of the value. Valid only for values of `0` through `63`. | two-byte mode: upper six bits and the following byte is the LE encoding of the value. Valid only for values `64` through `(2^14 - 1)`. | four-byte mode: upper six bits and the following three bytes are the LE encoding of the value. Valid only for values `(2^14)` through `(2^30 - 1)`. |Big-integer mode: The upper six bits are the number of bytes following, plus four. The value is contained, LE encoded, in the bytes following. The final (most significant) byte must be non-zero. Valid only for values `(2^30)` through `(2^536 - 1)`. |
-
-</div>
+| `0b00`                                                                                                        | `0b01`                                                                                                                                 | `0b10`                                                                                                                                              | `0b11`                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| single-byte mode; upper six bits are the LE encoding of the value. Valid only for values of `0` through `63`. | two-byte mode: upper six bits and the following byte is the LE encoding of the value. Valid only for values `64` through `(2^14 - 1)`. | four-byte mode: upper six bits and the following three bytes are the LE encoding of the value. Valid only for values `(2^14)` through `(2^30 - 1)`. | Big-integer mode: The upper six bits are the number of bytes following, plus four. The value is contained, LE encoded, in the bytes following. The final (most significant) byte must be non-zero. Valid only for values `(2^30)` through `(2^536 - 1)`. |
 
 Compact/general integers are encoded with the two least significant **bits** denoting the mode.
 
----
+***
 
 ### Compact Integers: 0
 
@@ -261,7 +225,7 @@ fn main() {
 [00]
 ```
 
----
+***
 
 ### Compact Integers: 42
 
@@ -286,11 +250,11 @@ fn main() {
 [a8]
 ```
 
-- 42 as binary: `0b101010` = `[0x2a]`.
-- Add `00` to the least significant bits.
-- `0b10101000` = `[0xa8]` = 168 as decimal.
+* 42 as binary: `0b101010` = `[0x2a]`.
+* Add `00` to the least significant bits.
+* `0b10101000` = `[0xa8]` = 168 as decimal.
 
----
+***
 
 ### Compact Integers: 69
 
@@ -315,11 +279,11 @@ fn main() {
 [15, 01]
 ```
 
-- 69 as binary: `0b1000101` = `[0x45]`.
-- Add `01` to the least significant bits.
-- `0b100010101` = `[0x15, 0x01]` = 277 as decimal.
+* 69 as binary: `0b1000101` = `[0x45]`.
+* Add `01` to the least significant bits.
+* `0b100010101` = `[0x15, 0x01]` = 277 as decimal.
 
----
+***
 
 ### Compact Integers: 65535 (u16::MAX)
 
@@ -344,17 +308,17 @@ fn main() {
 [fe, ff, 03, 00]
 ```
 
-- 65535 as binary: `0b1111111111111111` = `[0xff, 0xff]`.
-- Add `10` to the least significant bits.
-- `0b111111111111111110` = `[0xfe, 0xff, 0x03, 0x00]`: 262142 as decimal.
+* 65535 as binary: `0b1111111111111111` = `[0xff, 0xff]`.
+* Add `10` to the least significant bits.
+* `0b111111111111111110` = `[0xfe, 0xff, 0x03, 0x00]`: 262142 as decimal.
 
----
+***
 
 ### Compact Integers Are "Backwards Compatible"
 
 As you can see, you are able to "upgrade" a type without affecting the encoding.
 
----
+***
 
 ### Enum
 
@@ -386,7 +350,7 @@ fn main() {
 [03]
 ```
 
----
+***
 
 ### Tuple and Struct
 
@@ -422,7 +386,7 @@ Notes:
 
 Note that tuple and struct encode the same, even though struct has named fields.
 
----
+***
 
 ## Embedded Compact
 
@@ -454,7 +418,7 @@ fn main() {
 [00, 2a, 00, 00, 00, 00, 00, 00, 00, e5, 14]
 ```
 
----
+***
 
 ### Unit, Bool, Option, and Result
 
@@ -482,13 +446,13 @@ fn main() {
 [00]
 ```
 
----
+***
 
 ### Arrays, Vectors, and Strings
 
-- Arrays: Just concatenate the items.
-- Vectors: Also prefix with length (compact encoded).
-- String: Just `Vec<u8>` as utf-8 characters.
+* Arrays: Just concatenate the items.
+* Vectors: Also prefix with length (compact encoded).
+* String: Just `Vec<u8>` as utf-8 characters.
 
 ```rust
 use parity_scale_codec::Encode;
@@ -512,7 +476,7 @@ Notes:
 
 Note that the length prefix can be multiple bytes, like the last example.
 
----
+***
 
 ### Decoding
 
@@ -522,7 +486,7 @@ Metadata can be used to convey to a program how to decode a type properly...
 
 But bad or no information means the proper format for the data cannot be known.
 
----
+***
 
 ### Decoding Examples
 
@@ -553,19 +517,19 @@ Err(Error { cause: None, desc: "Not enough data to fill buffer" })
 
 Notes:
 
-- Decoding can fail
-- Values can decode badly
+* Decoding can fail
+* Values can decode badly
 
----
+***
 
 ### Decode Limits
 
-- Decoding isn't free!
-- The more complex the decode type, the more computation that will be used to decode the value.
-- Generally you always want to `decode_with_depth_limit`.
-- Substrate uses a limit of 256.
+* Decoding isn't free!
+* The more complex the decode type, the more computation that will be used to decode the value.
+* Generally you always want to `decode_with_depth_limit`.
+* Substrate uses a limit of 256.
 
----
+***
 
 ### Decode Bomb
 
@@ -594,7 +558,7 @@ Ok(Second(Second(Second(Second(Second(First))))))
 Err(Error { cause: Some(Error { cause: Some(Error { cause: Some(Error { cause: Some(Error { cause: None, desc: "Maximum recursion depth reached when decoding" }), desc: "Could not decode `Example::Second.0`" }), desc: "Could not decode `Example::Second.0`" }), desc: "Could not decode `Example::Second.0`" }), desc: "Could not decode `Example::Second.0`" })
 ```
 
----
+***
 
 ### Exceptions: BTreeSet
 
@@ -621,32 +585,31 @@ fn main() {
 [14, 00, 01, 02, 03, 04]
 ```
 
----
+***
 
 ### Optimizations and Tricks
 
-- `DecodeLength`: Read the length of a collection (like `Vec`) without decoding everything.
+* `DecodeLength`: Read the length of a collection (like `Vec`) without decoding everything.
+* `EncodeAppend`: Append an item without decoding all the other items. (like `Vec`)
 
-- `EncodeAppend`: Append an item without decoding all the other items. (like `Vec`)
-
----
+***
 
 ### Implementations
 
 SCALE Codec has been implemented in other languages, including:
 
-- Python: [`polkascan/py-scale-codec`](https://github.com/polkascan/py-scale-codec/)
-- Golang: [`itering/scale.go`](https://github.com/itering/scale.go/)
-- C: [`MatthewDarnell/cScale`](https://github.com/MatthewDarnell/cScale/)
-- C++: [`soramitsu/scale-codec-cpp`](https://github.com/qdrvm/scale-codec-cpp/)
-- JavaScript: [`polkadot-js/api`](https://github.com/polkadot-js/api/)
-- TypeScript: [`scale-ts`](https://github.com/unstoppablejs/unstoppablejs/tree/main/packages/scale-ts#scale-ts)
-- AssemblyScript: [`LimeChain/as-scale-codec`](https://github.com/LimeChain/as-scale-codec/)
-- Haskell: [`airalab/hs-web3`](https://github.com/airalab/hs-web3/tree/master/packages/scale/)
-- Java: [`emeraldpay/polkaj`](https://github.com/emeraldpay/polkaj/)
-- Ruby: [`wuminzhe/scale_rb`](https://github.com/wuminzhe/scale_rb/)
+* Python: [`polkascan/py-scale-codec`](https://github.com/polkascan/py-scale-codec/)
+* Golang: [`itering/scale.go`](https://github.com/itering/scale.go/)
+* C: [`MatthewDarnell/cScale`](https://github.com/MatthewDarnell/cScale/)
+* C++: [`soramitsu/scale-codec-cpp`](https://github.com/qdrvm/scale-codec-cpp/)
+* JavaScript: [`polkadot-js/api`](https://github.com/polkadot-js/api/)
+* TypeScript: [`scale-ts`](https://github.com/unstoppablejs/unstoppablejs/tree/main/packages/scale-ts#scale-ts)
+* AssemblyScript: [`LimeChain/as-scale-codec`](https://github.com/LimeChain/as-scale-codec/)
+* Haskell: [`airalab/hs-web3`](https://github.com/airalab/hs-web3/tree/master/packages/scale/)
+* Java: [`emeraldpay/polkaj`](https://github.com/emeraldpay/polkaj/)
+* Ruby: [`wuminzhe/scale_rb`](https://github.com/wuminzhe/scale_rb/)
 
----
+***
 
 ## Missing Some Metadata?
 
@@ -654,16 +617,16 @@ To make SCALE useful as an encoding format within the Substrate and Polkadot eco
 
 HINT: We do.
 
----
+***
 
 ### Remember, in the end of the day, everything is just 0's and 1's.
 
----
+***
 
 ## Additional Resources! 😋
 
 > Check speaker notes (click "s" 😉)
 
-<img width="300px" rounded src="./img/thats_all_folks.png" />
+![](img/thats_all_folks.png)
 
 Notes:

@@ -1,1 +1,2 @@
-# 🕵️ Applied Security
+# Applied Security
+

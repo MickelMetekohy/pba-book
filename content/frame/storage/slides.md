@@ -1,459 +1,309 @@
 ---
 title: FRAME Storage
-description: Deep dive into FRAME Storage
 duration: 1 hour
+description: Deep dive into FRAME Storage
 ---
 
 # FRAME Storage
 
----
+***
 
 ## FRAME Storage
 
 In this presentation, we will go even deeper into the concepts of Substrate storage, and see what kind of storage primitives FRAME provides you with to make Pallet development easy.
 
----
+***
 
-<div class="flex-container">
+| Developer            |
+| -------------------- |
+| Runtime Storage API  |
+| Storage Overlays     |
+| Patricia-Merkle Trie |
+| Key-Value Database   |
+| Computer             |
 
-<div class="left-small">
-	<table class="storage-layer-table">
-	<tr><td class="ends">Developer</td></tr>
-	<tr><td style="background-color: pink;">Runtime Storage API</td></tr>
-	<tr><td style="background-color: pink;">Storage Overlays</td></tr>
-	<tr><td>Patricia-Merkle Trie</td></tr>
-	<tr><td>Key-Value Database</td></tr>
-	<tr><td class="ends">Computer</td></tr>
-	</table>
-</div>
-<div class="right">
-
-### Storage layers
+#### Storage layers
 
 As we have learned, there are four core layers to Substrate's storage system.
 
 Today we will focus on the top two layers: Runtime Storage APIs and Storage Overlays, which FRAME uses to improve developer experience.
 
-</div>
-</div>
-
----
+***
 
 ### Overlay Deep Dive
 
-<br />
-<div class="flex-container">
-<div class="left-small" style="font-size:0.9em">
+\
+
 
 The overlay stages changes to the underlying database.
 
-</div>
+| Runtime Logic  |
+| -------------- |
+| Runtime Memory |
 
-<div class="right">
+\
 
-<table class="overlay-table">
-<tr><td style="background-color: red;">Runtime Logic</td></tr>
-<tr><td style="background-color: darkred;">Runtime Memory</td></tr>
-</table>
 
-<br />
-<table class="overlay-table" style="background-color: green;">
-<tr><td>Runtime Storage API</td></tr>
-</table>
+\
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Overlay Change Set</td></tr>
-<tr>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-</tr>
-</table>
 
-<br />
-<table class="overlay-table" style="background-color: blue;">
-<tr><td>Memory / Database Interface</td></tr>
-</table>
+| Overlay Change Set |   |   |   |
+| ------------------ | - | - | - |
+|                    |   |   |   |
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Database</td></tr>
-<tr>
-	<td>Alice: 10</td>
-	<td>Bob: 20</td>
-	<td>Cindy: 30</td>
-	<td>Dave: 40</td>
-</tr>
-</table>
+\
 
-</div>
 
----
+\
 
-### Overlay: Balance Transfer
 
-<div class="flex-container">
-<div class="left-small" style="font-size:0.9em">
+| Database  |         |           |          |
+| --------- | ------- | --------- | -------- |
+| Alice: 10 | Bob: 20 | Cindy: 30 | Dave: 40 |
+
+***
+
+#### Overlay: Balance Transfer
 
 1. Runtime Logic Initiates.
-1. Calls the Runtime Storage API.
-1. First we query the Overlay Change Set.
-   - Unfortunately it's not there.
-1. Then we query the underlying Database.
-   - Very slow as you have learned so far.
+2. Calls the Runtime Storage API.
+3. First we query the Overlay Change Set.
+   * Unfortunately it's not there.
+4. Then we query the underlying Database.
+   * Very slow as you have learned so far.
 
-</div>
+| Runtime Logic  |
+| -------------- |
+| Runtime Memory |
 
-<div class="right">
+\
 
-<table class="overlay-table">
-<tr><td style="background-color: red;">Runtime Logic</td></tr>
-<tr><td style="background-color: darkred;">Runtime Memory</td></tr>
-</table>
 
-<br />
-<table class="overlay-table" style="background-color: green;">
-<tr><td>Runtime Storage API</td></tr>
-</table>
+\
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Overlay Change Set</td></tr>
-<tr>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-</tr>
-</table>
 
-<br />
-<table class="overlay-table" style="background-color: blue;">
-<tr><td>Memory / Database Interface</td></tr>
-</table>
+| Overlay Change Set |   |   |   |
+| ------------------ | - | - | - |
+|                    |   |   |   |
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Database</td></tr>
-<tr>
-	<td>Alice: 10</td>
-	<td>Bob: 20</td>
-	<td>Cindy: 30</td>
-	<td>Dave: 40</td>
-</tr>
-</table>
+\
 
-</div>
 
----
+\
 
-### Overlay: Balance Transfer
 
-<br />
-<div class="flex-container">
-<div class="left-small">
+| Database  |         |           |          |
+| --------- | ------- | --------- | -------- |
+| Alice: 10 | Bob: 20 | Cindy: 30 | Dave: 40 |
 
-- As we return the data back to the runtime, we cache the values in the overlay.
-- Subsequent reads and writes happen in the overlay, since the data is there.
+***
 
-</div>
-<div class="right">
+#### Overlay: Balance Transfer
 
-<table class="overlay-table">
-<tr><td style="background-color: red;">Runtime Logic</td></tr>
-<tr><td style="background-color: darkred;">Runtime Memory</td></tr>
-</table>
+\
 
-<br />
-<table class="overlay-table" style="background-color: green;">
-<tr><td>Runtime Storage API</td></tr>
-</table>
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Overlay Change Set</td></tr>
-<tr>
-	<td>Alice: 10</td>
-	<td>Bob: 20</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-</tr>
-</table>
+* As we return the data back to the runtime, we cache the values in the overlay.
+* Subsequent reads and writes happen in the overlay, since the data is there.
 
-<br />
-<table class="overlay-table" style="background-color: blue;">
-<tr><td>Memory / Database Interface</td></tr>
-</table>
+| Runtime Logic  |
+| -------------- |
+| Runtime Memory |
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Database</td></tr>
-<tr>
-	<td>Alice: 10</td>
-	<td>Bob: 20</td>
-	<td>Cindy: 30</td>
-	<td>Dave: 40</td>
-</tr>
-</table>
+\
 
-</div>
 
----
+\
 
-### Overlay: Balance Transfer
 
-<br />
-<div class="flex-container">
-<div class="left-small">
+| Overlay Change Set |         |   |   |
+| ------------------ | ------- | - | - |
+| Alice: 10          | Bob: 20 |   |   |
 
-- The actual transfer logic happens in the runtime memory.
-- At some point, the runtime logic writes the new balances to storage, this updates the overlay cache.
-- The underlying database is not updated yet.
+\
 
-</div>
-<div class="right">
 
-<table class="overlay-table">
-<tr><td style="background-color: red;">Runtime Logic</td></tr>
-<tr><td style="background-color: darkred;">Runtime Memory</td></tr>
-</table>
+\
 
-<br />
-<table class="overlay-table" style="background-color: green;">
-<tr><td>Runtime Storage API</td></tr>
-</table>
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Overlay Change Set</td></tr>
-<tr>
-	<td style="color: yellow;">Alice: 15</td>
-	<td style="color: yellow;">Bob: 15</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-</tr>
-</table>
+| Database  |         |           |          |
+| --------- | ------- | --------- | -------- |
+| Alice: 10 | Bob: 20 | Cindy: 30 | Dave: 40 |
 
-<br />
-<table class="overlay-table" style="background-color: blue;">
-<tr><td>Memory / Database Interface</td></tr>
-</table>
+***
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Database</td></tr>
-<tr>
-	<td>Alice: 10</td>
-	<td>Bob: 20</td>
-	<td>Cindy: 30</td>
-	<td>Dave: 40</td>
-</tr>
-</table>
+#### Overlay: Balance Transfer
 
-</div>
+\
 
----
 
-### Overlay: Balance Transfer
+* The actual transfer logic happens in the runtime memory.
+* At some point, the runtime logic writes the new balances to storage, this updates the overlay cache.
+* The underlying database is not updated yet.
 
-<br />
-<div class="flex-container">
-<div class="left-small">
+| Runtime Logic  |
+| -------------- |
+| Runtime Memory |
 
-- At the end of the block, staged changes are committed to the database all at once.
-- Then storage root is recomputed a single time for the final block state.
+\
 
-</div>
-<div class="right">
 
-<table class="overlay-table">
-<tr><td style="background-color: red;">Runtime Logic</td></tr>
-<tr><td style="background-color: darkred;">Runtime Memory</td></tr>
-</table>
+\
 
-<br />
-<table class="overlay-table" style="background-color: green;">
-<tr><td>Runtime Storage API</td></tr>
-</table>
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Overlay Change Set</td></tr>
-<tr>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-</tr>
-</table>
+| Overlay Change Set |         |   |   |
+| ------------------ | ------- | - | - |
+| Alice: 15          | Bob: 15 |   |   |
 
-<br />
-<table class="overlay-table" style="background-color: blue;">
-<tr><td>Memory / Database Interface</td></tr>
-</table>
+\
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Database</td></tr>
-<tr>
-	<td style="color: lightgreen;">Alice: 15</td>
-	<td style="color: lightgreen;">Bob: 15</td>
-	<td>Cindy: 30</td>
-	<td>Dave: 40</td>
-</tr>
-</table>
 
-</div>
+\
 
----
 
-### Overlay: Implications
+| Database  |         |           |          |
+| --------- | ------- | --------- | -------- |
+| Alice: 10 | Bob: 20 | Cindy: 30 | Dave: 40 |
 
-<br />
-<div class="flex-container">
-<div class="left-small">
+***
 
-- Reading the same storage a second or more time is faster (not free) than the initial read.
-- Writing the same value multiple times is fast (not free), and only results in a single final Database write.
+#### Overlay: Balance Transfer
 
-</div>
-<div class="right">
+\
 
-<table class="overlay-table">
-<tr><td style="background-color: red;">Runtime Logic</td></tr>
-<tr><td style="background-color: darkred;">Runtime Memory</td></tr>
-</table>
 
-<br />
-<table class="overlay-table" style="background-color: green;">
-<tr><td>Runtime Storage API</td></tr>
-</table>
+* At the end of the block, staged changes are committed to the database all at once.
+* Then storage root is recomputed a single time for the final block state.
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Overlay Change Set</td></tr>
-<tr>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
-</tr>
-</table>
+| Runtime Logic  |
+| -------------- |
+| Runtime Memory |
 
-<br />
-<table class="overlay-table" style="background-color: blue;">
-<tr><td>Memory / Database Interface</td></tr>
-</table>
+\
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Database</td></tr>
-<tr>
-	<td>Alice: 15</td>
-	<td>Bob: 15</td>
-	<td>Cindy: 30</td>
-	<td>Dave: 40</td>
-</tr>
-</table>
 
-</div>
+\
+
+
+| Overlay Change Set |   |   |   |
+| ------------------ | - | - | - |
+|                    |   |   |   |
+
+\
+
+
+\
+
+
+| Database  |         |           |          |
+| --------- | ------- | --------- | -------- |
+| Alice: 15 | Bob: 15 | Cindy: 30 | Dave: 40 |
+
+***
+
+#### Overlay: Implications
+
+\
+
+
+* Reading the same storage a second or more time is faster (not free) than the initial read.
+* Writing the same value multiple times is fast (not free), and only results in a single final Database write.
+
+| Runtime Logic  |
+| -------------- |
+| Runtime Memory |
+
+\
+
+
+\
+
+
+| Overlay Change Set |   |   |   |
+| ------------------ | - | - | - |
+|                    |   |   |   |
+
+\
+
+
+\
+
+
+| Database  |         |           |          |
+| --------- | ------- | --------- | -------- |
+| Alice: 15 | Bob: 15 | Cindy: 30 | Dave: 40 |
 
 Notes:
 
 also this means that cross implementation of substrate/polkadot can be tricky to ensure determinism (also true for next slide).
 
----
+***
 
-### Additional Storage Overlays (Transactional)
+#### Additional Storage Overlays (Transactional)
 
-<br />
-<div class="flex-container">
-<div class="left-small text-small">
+\
 
-- The runtime has the ability to spawn additional storage layers, called "transactional layers".
-- This can allow you to commit changes through the Runtime Storage API, but then drop the changes if you want before they get to the overlay change set.
-- The runtime can spawn multiple transactional layers, each at different times, allowing the runtime developer to logically separate when they want to commit or rollback changes.
 
-</div>
-<div class="right text-small">
+* The runtime has the ability to spawn additional storage layers, called "transactional layers".
+* This can allow you to commit changes through the Runtime Storage API, but then drop the changes if you want before they get to the overlay change set.
+* The runtime can spawn multiple transactional layers, each at different times, allowing the runtime developer to logically separate when they want to commit or rollback changes.
 
-<table class="overlay-table">
-<tr><td style="background-color: red;">Runtime Logic</td></tr>
-<tr><td style="background-color: darkred;">Runtime Memory</td></tr>
-</table>
+| Runtime Logic  |
+| -------------- |
+| Runtime Memory |
 
-<br />
-<table class="overlay-table" style="background-color: green;">
-<tr><td>Runtime Storage API</td></tr>
-</table>
+\
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Transactional Layer</td></tr>
-<tr>
-	<td style="color: yellow;">Alice: 25</td>
-	<td>&nbsp;</td>
-	<td style="color: yellow;">Cindy: 20</td>
-	<td>&nbsp;</td>
-</tr>
-</table>
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Overlay Change Set</td></tr>
-<tr>
-	<td>Alice: 15</td>
-	<td>&nbsp;</td>
-	<td>Cindy: 30</td>
-	<td>&nbsp;</td>
-</tr>
-</table>
+\
 
-<br />
-<table class="overlay-table" style="background-color: blue;">
-<tr><td>Memory / Database Interface</td></tr>
-</table>
 
-<br />
-<table class="overlay-table">
-<tr><td colspan=4>Database</td></tr>
-<tr>
-	<td>Alice: 15</td>
-	<td>Bob: 15</td>
-	<td>Cindy: 30</td>
-	<td>Dave: 40</td>
-</tr>
-</table>
+| Transactional Layer |   |           |   |
+| ------------------- | - | --------- | - |
+| Alice: 25           |   | Cindy: 20 |   |
 
-</div>
+\
 
----
 
-### Transactional Implementation Details
+| Overlay Change Set |   |           |   |
+| ------------------ | - | --------- | - |
+| Alice: 15          |   | Cindy: 30 |   |
 
-- Non-Zero Overhead (but quite small)
-  - 0.15% overhead per key written, per storage layer.
-- Values are not copied between layers.
-  - Values are stored in heap, and we just move pointers around.
-  - So overhead has nothing to do with storage size, just the number of storage items in a layer.
-- Storage layers use client memory, so practically no upper limit.
+\
+
+
+\
+
+
+| Database  |         |           |          |
+| --------- | ------- | --------- | -------- |
+| Alice: 15 | Bob: 15 | Cindy: 30 | Dave: 40 |
+
+***
+
+#### Transactional Implementation Details
+
+* Non-Zero Overhead (but quite small)
+  * 0.15% overhead per key written, per storage layer.
+* Values are not copied between layers.
+  * Values are stored in heap, and we just move pointers around.
+  * So overhead has nothing to do with storage size, just the number of storage items in a layer.
+* Storage layers use client memory, so practically no upper limit.
 
 Notes:
 
 For more details see:
 
-- <https://github.com/paritytech/substrate/pull/10413>
-- <https://github.com/paritytech/substrate/pull/10809>
+* [https://github.com/paritytech/substrate/pull/10413](https://github.com/paritytech/substrate/pull/10413)
+* [https://github.com/paritytech/substrate/pull/10809](https://github.com/paritytech/substrate/pull/10809)
 
 In module 6, we can take a closer look at how this functionality is exposed in FRAME.
 
-See: <https://github.com/paritytech/substrate/pull/11431>
+See: [https://github.com/paritytech/substrate/pull/11431](https://github.com/paritytech/substrate/pull/11431)
 
----
+***
 
-## Storage Layer by Default
+### Storage Layer by Default
 
 All extrinsics execute within a transactional storage layer.
 
@@ -461,41 +311,42 @@ This means that if you return an `Error` from your extrinsic, all changes to sto
 
 This is the same behavior as you would expect from smart contract environments like Ethereum.
 
----
+***
 
-### Transactional Layer Attack
+#### Transactional Layer Attack
 
 Transactional layers can be used to attack your chain:
 
-<br />
+\
 
-- Allow a user to spawn a lot of transactional layers.
-- On the top layer, make a bunch of changes.
-- All of those changes will need to propagate down each time.
+
+* Allow a user to spawn a lot of transactional layers.
+* On the top layer, make a bunch of changes.
+* All of those changes will need to propagate down each time.
 
 **Solution:**
 
-- Do not allow the user to create an unbounded number of layers within your runtime logic.
+* Do not allow the user to create an unbounded number of layers within your runtime logic.
 
----
+***
 
-# Runtime Storage APIs
+## Runtime Storage APIs
 
----
+***
 
-## Patricia Trie
+### Patricia Trie
 
-<img style="height: 500px;" src="./img/patricia-trie.svg" />
+![](img/patricia-trie.svg)
 
----
+***
 
-## Storage Keys
+### Storage Keys
 
-<img style="height: 500px;" src="./img/navigate-storage-2.svg" />
+![](img/navigate-storage-2.svg)
 
----
+***
 
-## FRAME Storage Keys
+### FRAME Storage Keys
 
 We follow a simple pattern:
 
@@ -511,9 +362,9 @@ twox128(pallet_name) ++ twox128(storage_name) ++ ...
 
 We will get into more details as we look at the specific storage primitives.
 
----
+***
 
-## Pallet Name
+### Pallet Name
 
 The pallet name comes from the `construct_runtime!`.
 
@@ -529,21 +380,21 @@ frame_support::construct_runtime!(
 
 This means that changing the name of your pallet here is a **BREAKING** change, since it will change your storage keys.
 
----
+***
 
-## FRAME Storage Primitives
+### FRAME Storage Primitives
 
-- `StorageValue`
-- `StorageMap`
-- `CountedStorageMap`
-- `StorageDoubleMap`
-- `StorageNMap`
+* `StorageValue`
+* `StorageMap`
+* `CountedStorageMap`
+* `StorageDoubleMap`
+* `StorageNMap`
 
 We will go over all of them, and many important and subtle details along the way.
 
----
+***
 
-## Storage Value
+### Storage Value
 
 Place a single item into the runtime storage.
 
@@ -557,9 +408,9 @@ Storage Key:
 Twox128(Prefix::pallet_prefix()) ++ Twox128(Prefix::STORAGE_PREFIX)
 ```
 
----
+***
 
-## Storage Value: Example
+### Storage Value: Example
 
 ```rust
 #[pallet::storage]
@@ -577,9 +428,9 @@ fn storage_value() {
 }
 ```
 
----
+***
 
-## Storage "Prefix"
+### Storage "Prefix"
 
 The first generic parameter in any FRAME storage is the `Prefix`, which is used to generate the storage key.
 
@@ -599,11 +450,11 @@ This is populated thanks to FRAME's macro magic.
 
 Notes:
 
-<https://substrate.stackexchange.com/questions/476/storage-definition-syntax/478#478>
+[https://substrate.stackexchange.com/questions/476/storage-definition-syntax/478#478](https://substrate.stackexchange.com/questions/476/storage-definition-syntax/478#478)
 
----
+***
 
-## Storage Value Key
+### Storage Value Key
 
 ```rust
 use sp_core::hexdisplay::HexDisplay;
@@ -625,9 +476,9 @@ twox128("Example") = e375d60f814d02157aaaa18f3639a254
 twox128("Item1") = c64445c290236a18189385ed9853fb1e
 ```
 
----
+***
 
-## Demystifying FRAME Storage
+### Demystifying FRAME Storage
 
 This shows _basically_ what is going on when you use pallet storage. NOT accurate, but should be informative. As you can see, it is really not that complex.
 
@@ -663,18 +514,18 @@ trait StorageValue<Prefix, Type> {
 }
 ```
 
----
+***
 
-## All Storage is an Option
+### All Storage is an Option
 
-- At the Runtime Storage API level, a storage key will either have a value or not have a value.
-- If there is no value, any query from the backend will be `None`.
-- If there is a value, the query will be `Some(value)`.
-- However, we can also hide this with a `Default` value.
+* At the Runtime Storage API level, a storage key will either have a value or not have a value.
+* If there is no value, any query from the backend will be `None`.
+* If there is a value, the query will be `Some(value)`.
+* However, we can also hide this with a `Default` value.
 
----
+***
 
-## Query If Storage Actually Exists
+### Query If Storage Actually Exists
 
 There are APIs which expose to you whether the value actually exists in the database.
 
@@ -694,12 +545,12 @@ fn storage_value() {
 }
 ```
 
----
+***
 
-## Query Kind
+### Query Kind
 
-- `OptionQuery`: Default choice, represents the actual DB state.
-- `ValueQuery`: Return a value when `None`. (`Default` or configurable)
+* `OptionQuery`: Default choice, represents the actual DB state.
+* `ValueQuery`: Return a value when `None`. (`Default` or configurable)
 
 ```rust
 #[pallet::storage]
@@ -720,9 +571,9 @@ fn value_query() {
 
 Remember that 0 is not actually in storage when doing the first query.
 
----
+***
 
-## On Empty
+### On Empty
 
 You can control the `OnEmpty` value with:
 
@@ -748,9 +599,9 @@ fn my_default() {
 
 Remember that 42 is not actually in storage when doing the first query.
 
----
+***
 
-## Not Magic
+### Not Magic
 
 These "extra features" are just ways to simplify your code.
 
@@ -762,12 +613,12 @@ let value = Item1::<T>::try_get().unwrap_or(42u32);
 
 But you wouldn't want to do this every time.
 
----
+***
 
-## Set vs Put
+### Set vs Put
 
-- `pub fn set(val: QueryKind::Query)`
-- `pub fn put<Arg: EncodeLike<Value>>(val: Arg)`
+* `pub fn set(val: QueryKind::Query)`
+* `pub fn put<Arg: EncodeLike<Value>>(val: Arg)`
 
 For Example:
 
@@ -781,9 +632,9 @@ Item1::<T>::set(Some(42u32));
 Item1::<T>::put(42u32);
 ```
 
----
+***
 
-## Don't Put The Option AS the Storage Value
+### Don't Put The Option AS the Storage Value
 
 This is basically an anti-pattern, and it doesn't really make sense to do.
 
@@ -809,9 +660,9 @@ fn nonsense() {
 }
 ```
 
----
+***
 
-## Unit Type Instead of Bool
+### Unit Type Instead of Bool
 
 You might want to simply signify some true or false value in storage...
 
@@ -835,9 +686,9 @@ fn better_bool() {
 }
 ```
 
----
+***
 
-## Kill Storage
+### Kill Storage
 
 Remove the item from the database using `kill()` or `take()`.
 
@@ -864,9 +715,9 @@ fn kill() {
 }
 ```
 
----
+***
 
-## Mutate
+### Mutate
 
 Execute a closure on a storage item.
 
@@ -885,9 +736,9 @@ fn mutate() {
 }
 ```
 
----
+***
 
-## Try Mutate
+### Try Mutate
 
 Execute a closure on a storage item, but only write if the closure returns `Ok`.
 
@@ -910,9 +761,9 @@ fn try_mutate() {
 }
 ```
 
----
+***
 
-## Assert Noop
+### Assert Noop
 
 You may have noticed we just used `assert_noop!` instead of `assert_err!`.
 
@@ -936,9 +787,9 @@ macro_rules! assert_noop {
 
 There is also `assert_storage_noop!` which does not care what is returned, just that storage is not changed.
 
----
+***
 
-## Vec Tricks
+### Vec Tricks
 
 You can use `decode_len()` and `append()` to work with a `Vec` without decoding all the items.
 
@@ -963,25 +814,25 @@ fn vec_tricks() {
 }
 ```
 
----
+***
 
-## Bounded Storage
+### Bounded Storage
 
 You may have noticed `#[pallet::unbounded]` on the storage item in the previous slide.
 
 Remember that blockchains are limited by:
 
-- Computation Time
-- Memory Limits
-- Storage Size / Proof Size
+* Computation Time
+* Memory Limits
+* Storage Size / Proof Size
 
 In general, every storage item in FRAME should be **bounded** in size.
 
 We will talk about this more when we discuss benchmarking.
 
----
+***
 
-## Bounded Vector
+### Bounded Vector
 
 We have bounded versions of unbounded items like `Vec`, `BTreeSet`, etc...
 
@@ -1005,9 +856,9 @@ fn bounded_vec() {
 }
 ```
 
----
+***
 
-## Storage Map
+### Storage Map
 
 Store items in storage as a key and value map.
 
@@ -1021,9 +872,9 @@ Storage Key:
 Twox128(Prefix::pallet_prefix()) ++ Twox128(Prefix::STORAGE_PREFIX) ++ Hasher1(encode(key))
 ```
 
----
+***
 
-## Storage Map: Example
+### Storage Map: Example
 
 ```rust
 #[pallet::storage]
@@ -1041,9 +892,9 @@ fn storage_map() {
 }
 ```
 
----
+***
 
-## Storage Map Key
+### Storage Map Key
 
 With a storage map, you can introduce a "key" and "value" of arbitrary type.
 
@@ -1053,17 +904,17 @@ pub struct StorageMap<Prefix, Hasher, Key, Value, ...>(_);
 
 The storage key for a map uses the hash of the key. You can choose the storage hasher, these are the ones currently implemented:
 
-- Identity (no hash at all)
-- Blake2_128
-- Blake2_256
-- Twox128
-- Twox256
-- Twox64Concat (special)
-- Blake2_128Concat (special)
+* Identity (no hash at all)
+* Blake2\_128
+* Blake2\_256
+* Twox128
+* Twox256
+* Twox64Concat (special)
+* Blake2\_128Concat (special)
 
----
+***
 
-## Value Query: Balances
+### Value Query: Balances
 
 ```rust
 #[pallet::storage]
@@ -1099,19 +950,19 @@ fn balance_map() {
 }
 ```
 
----
+***
 
-## Prefix Tries
+### Prefix Tries
 
 All pallets and storage items naturally form "prefix tries".
 
-<img style="height: 500px;" src="./img/balance-trie.svg" />
+![](img/balance-trie.svg)
 
 In this diagram, a pallet "Balances" has a storage value "Total Issuance" and a map of "Accounts" with balances as the value.
 
----
+***
 
-## Prefix Trie Keys
+### Prefix Trie Keys
 
 Let's now look at the keys of these storage items:
 
@@ -1128,31 +979,18 @@ e375d60f814d02157aaaa18f3639a254ca79d14bc48854f664528f3a696b6c27c804ce198ec337e3
 e375d60f814d02157aaaa18f3639a254ca79d14bc48854f664528f3a696b6c279ea2d098b5f70192f96c06f38d3fbc97
 ```
 
-<table style="font-size: 24px">
-<tr>
-	<td><span style="color: red;">e375d60f814d02157aaaa18f3639a254</span></td>
-	<td><span style="color: lightblue;">6fe5a43b77d7334acfb711a021a514b8</span></td>
-	<td>&nbsp;</td>
-</tr>
-<tr>
-	<td><span style="color: red;">e375d60f814d02157aaaa18f3639a254</span></td>
-	<td><span style="color: lightgreen;">ca79d14bc48854f664528f3a696b6c27</span></td>
-	<td><span style="color: pink;">c804ce198ec337e3dc762bdd1a09aece</span></td>
-</tr>
-<tr>
-	<td><span style="color: red;">e375d60f814d02157aaaa18f3639a254</span></td>
-	<td><span style="color: lightgreen;">ca79d14bc48854f664528f3a696b6c27</span></td>
-	<td><span style="color: orange;">9ea2d098b5f70192f96c06f38d3fbc97</span></td>
-</tr>
-</table>
+| e375d60f814d02157aaaa18f3639a254 | 6fe5a43b77d7334acfb711a021a514b8 |                                  |
+| -------------------------------- | -------------------------------- | -------------------------------- |
+| e375d60f814d02157aaaa18f3639a254 | ca79d14bc48854f664528f3a696b6c27 | c804ce198ec337e3dc762bdd1a09aece |
+| e375d60f814d02157aaaa18f3639a254 | ca79d14bc48854f664528f3a696b6c27 | 9ea2d098b5f70192f96c06f38d3fbc97 |
 
----
+***
 
-## Storage Iteration
+### Storage Iteration
 
 Because all storage items form a prefix trie, you can iterate the content starting with any prefix:
 
-```rust [0|6-7]
+```rust
 impl<T: Decode + Sized> Iterator for StorageIterator<T> {
 	type Item = (Vec<u8>, T);
 
@@ -1181,13 +1019,13 @@ impl<T: Decode + Sized> Iterator for StorageIterator<T> {
 }
 ```
 
----
+***
 
-## You can...
+### You can...
 
-- Iterate all storage on the blockchain using prefix `&[]`
-- Iterate all storage for a pallet using prefix `hash(pallet_name)`
-- Iterate all balances of users using prefix `hash("Balances") ++ hash("Accounts")`
+* Iterate all storage on the blockchain using prefix `&[]`
+* Iterate all storage for a pallet using prefix `hash(pallet_name)`
+* Iterate all balances of users using prefix `hash("Balances") ++ hash("Accounts")`
 
 This is not an inherit property!
 
@@ -1195,27 +1033,27 @@ This is only because we "cleverly" chose this pattern for generating keys.
 
 Note that iteration has no "proper" order. All keys are hashed, and we just go in the order of the resulting hash.
 
----
+***
 
-## Opaque Storage Keys
+### Opaque Storage Keys
 
 But there is a problem...
 
 Let's say I iterate over all users' balances...
 
-- I will get all the balance values.
-- I will get all the storage keys.
-  - Which are all hashed.
-- I will NOT get the actual accounts which hold these balances!
+* I will get all the balance values.
+* I will get all the storage keys.
+  * Which are all hashed.
+* I will NOT get the actual accounts which hold these balances!
 
 For this, we need **transparent storage keys**.
 
----
+***
 
-## Transparent Hashes
+### Transparent Hashes
 
-- Twox64Concat
-- Blake2_128Concat
+* Twox64Concat
+* Blake2\_128Concat
 
 Basically:
 
@@ -1237,11 +1075,9 @@ twox64("world") = 0xef51ee66fefb78e7
 twox64concat("world") = 0xef51ee66fefb78e7776f726c64
 ```
 
----
+***
 
-## Better Balance Map
-
-<div class="text-small">
+### Better Balance Map
 
 We should use `Blake2_128Concat`!
 
@@ -1273,58 +1109,47 @@ fn better_balance_map() {
 [(6, 600), (5, 500), (3, 300), (1, 100), (8, 800), (4, 400), (7, 700), (9, 900), (0, 0), (2, 200)]
 ```
 
-</div>
+***
 
----
-
-## Which Hasher to Use?
+### Which Hasher to Use?
 
 Now that we know that transparent hashers are extremely useful, there are really just 3 choices:
 
-- `Identity` - No Hash at all
-- `Twox64Concat` - Non-Cryptographic and Transparent Hash
-- `Blake2_128Concat` - Cryptographic and Transparent Hash
+* `Identity` - No Hash at all
+* `Twox64Concat` - Non-Cryptographic and Transparent Hash
+* `Blake2_128Concat` - Cryptographic and Transparent Hash
 
----
+***
 
-## Unbalanced Trie
+### Unbalanced Trie
 
-<div class="flex-container">
-<div class="left">
+![](img/unbalanced-tree.svg)
 
-<img src="./img/unbalanced-tree.svg" />
+* We mentioned that unbalanced tries can be good at times...
+* But in this case, we must select a hasher which prevents a user from manipulating the balance of our prefix trie.
 
-</div>
-<div class="right">
+***
 
-- We mentioned that unbalanced tries can be good at times...
-- But in this case, we must select a hasher which prevents a user from manipulating the balance of our prefix trie.
-
-</div>
-</div>
-
----
-
-## Which Hasher to Use?
+### Which Hasher to Use?
 
 Basically, you should just always use `Blake2_128Concat` since it is hardest for a user to influence.The difference in time to execute is probably nominal (but not properly benchmarked afaik).
 
 Some reasonable exceptions:
 
-- If the key is already an uncontrollable cryptographic hash, you can use `Identity`.
-- If the key is simple and controlled by runtime (like an incremented count), `Twox64Concat` is good enough.
+* If the key is already an uncontrollable cryptographic hash, you can use `Identity`.
+* If the key is simple and controlled by runtime (like an incremented count), `Twox64Concat` is good enough.
 
 More info in the docs...
 
----
+***
 
-### Read the StorageMap Docs for API
+#### Read the StorageMap Docs for API
 
-<https://crates.parity.io/frame_support/pallet_prelude/struct.StorageMap.html>
+[https://crates.parity.io/frame\_support/pallet\_prelude/struct.StorageMap.html](https://crates.parity.io/frame_support/pallet_prelude/struct.StorageMap.html)
 
----
+***
 
-### StorageDoubleMap and StorageNMap
+#### StorageDoubleMap and StorageNMap
 
 Basically the same idea as `StorageMap`, but with more keys:
 
@@ -1349,9 +1174,9 @@ Twox128(Prefix::pallet_prefix())
 	++ HasherN(encode(keyN))
 ```
 
----
+***
 
-## StorageNMap: Example
+### StorageNMap: Example
 
 ```rust
 #[pallet::storage]
@@ -1378,19 +1203,19 @@ fn storage_n_map() {
 }
 ```
 
----
+***
 
-## Map Iteration Complexity
+### Map Iteration Complexity
 
-- Iterating over a map is extremely expensive for computational and storage proof resources.
-- Requires `N` trie reads which is really `N * log(N)` database reads.
-- Takes up `32 bytes per hash * 16 hashes per node * N * log(N)` proof size.
+* Iterating over a map is extremely expensive for computational and storage proof resources.
+* Requires `N` trie reads which is really `N * log(N)` database reads.
+* Takes up `32 bytes per hash * 16 hashes per node * N * log(N)` proof size.
 
 Generally you should not iterate on a map. If you do, make sure it is bounded!
 
----
+***
 
-## Remove All
+### Remove All
 
 Implemented on Storage Maps:
 
@@ -1410,9 +1235,9 @@ pub enum KillStorageResult {
 
 Rather than trying to delete all items at once, you can "freeze" the state machine, and have a user call `remove_all` multiple times using a limit.
 
----
+***
 
-## Counted Storage Map
+### Counted Storage Map
 
 A wrapper around a `StorageMap` and a `StorageValue<Value=u32>` to keep track of how many items are in a map, without needing to iterate all the values.
 
@@ -1422,9 +1247,9 @@ pub struct CountedStorageMap<Prefix, Hasher, Key, Value, QueryKind = OptionQuery
 
 This storage item has additional storage read and write overhead when manipulating values compared to a regular storage map.
 
----
+***
 
-## Counted Storage Map Demystified
+### Counted Storage Map Demystified
 
 ```rust
 #[pallet::storage]
@@ -1444,47 +1269,38 @@ pub type CounterForItem13<T: Config> = StorageValue<_, u32>;
 
 With some additional logic to keep these two in check.
 
----
+***
 
-## Architecture Considerations
+### Architecture Considerations
 
-- You know that accessing very large items from the database is not efficient:
-  - Databases like ParityDB are optimized for items under 32 KB.
-  - Decoding is non-zero overhead.
-- You know that accessing lots of storage items in a map is also very bad!
-  - Lots of overhead constantly calling host functions.
-  - Lots of overhead from the merkle trie lookup, and database reads.
-  - Lots of **additional** overhead in the storage proof
+* You know that accessing very large items from the database is not efficient:
+  * Databases like ParityDB are optimized for items under 32 KB.
+  * Decoding is non-zero overhead.
+* You know that accessing lots of storage items in a map is also very bad!
+  * Lots of overhead constantly calling host functions.
+  * Lots of overhead from the merkle trie lookup, and database reads.
+  * Lots of **additional** overhead in the storage proof
 
 So what do you pick?
 
----
+***
 
-## It depends! Sometimes both!
+### It depends! Sometimes both!
 
 The choice of storage depends on how your logic will access it.
 
-<div class="text-small">
+* Scenario A: We need to manage millions of users, and support balance transfers.
+  * We should obviously use a map! Balance transfers touch only 2 accounts at a time. 2 map reads is way more efficient than reading all million users to move the balance.
+* Scenario B: We need to get the 1,000 validators for the next era.
+  * We should obviously use a bounded vector! We know there is an upper limit of validators, and we will need to read them all for our logic!
+* Scenario C: We need to store some metadata about the configuration of each validator.
+  * We should probably use a map! We will be duplicating some data from from the vector above, but the way we access configuration stuff usually is on a per-validator basis.
 
-- Scenario A: We need to manage millions of users, and support balance transfers.
+***
 
-  - We should obviously use a map! Balance transfers touch only 2 accounts at a time. 2 map reads is way more efficient than reading all million users to move the balance.
+### Summary
 
-- Scenario B: We need to get the 1,000 validators for the next era.
-
-  - We should obviously use a bounded vector! We know there is an upper limit of validators, and we will need to read them all for our logic!
-
-- Scenario C: We need to store some metadata about the configuration of each validator.
-
-  - We should probably use a map! We will be duplicating some data from from the vector above, but the way we access configuration stuff usually is on a per-validator basis.
-
-</div>
-
----
-
-## Summary
-
-- FRAME Storage is just simple macros which wrap the underlying Substrate Storage APIs.
-- The principles of Substrate Storage directly inform what kinds of behaviors you can do in FRAME.
-- Just because something does not exist in FRAME does not mean you cannot do it!
-- Just because something does exist in FRAME does not mean you can use it without thinking!
+* FRAME Storage is just simple macros which wrap the underlying Substrate Storage APIs.
+* The principles of Substrate Storage directly inform what kinds of behaviors you can do in FRAME.
+* Just because something does not exist in FRAME does not mean you cannot do it!
+* Just because something does exist in FRAME does not mean you can use it without thinking!

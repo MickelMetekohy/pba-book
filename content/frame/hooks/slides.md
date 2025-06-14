@@ -1,32 +1,32 @@
 ---
 title: FRAME/Pallet Hooks
-description: FRAME/Pallet Hooks
 duration: 1 hour
+description: FRAME/Pallet Hooks
 ---
 
-# 🪝 FRAME/Pallet Hooks 🪝
+# FRAME/Pallet Hooks 🪝
 
----
+***
 
 ## Hooks: All In One
 
-- Onchain / STF
-  - `on_runtime_upgrade`
-  - `on_initialize`
-  - `poll` (WIP)
-  - `on_finalize`
-  - `on_idle`
-- Offchain:
-  - `genesis_build`
-  - `offchain_worker`
-  - `integrity_test`
-  - `try_state`
+* Onchain / STF
+  * `on_runtime_upgrade`
+  * `on_initialize`
+  * `poll` (WIP)
+  * `on_finalize`
+  * `on_idle`
+* Offchain:
+  * `genesis_build`
+  * `offchain_worker`
+  * `integrity_test`
+  * `try_state`
 
 Notes:
 
-<https://paritytech.github.io/substrate/master/frame_support/traits/trait.Hooks.html>
+[https://paritytech.github.io/substrate/master/frame\_support/traits/trait.Hooks.html](https://paritytech.github.io/substrate/master/frame_support/traits/trait.Hooks.html)
 
----v
+\---v
 
 ### Hooks: All In One
 
@@ -51,33 +51,32 @@ impl<T: Config> BuildGenesisConfig for GenesisConfig<T> {
 
 Notes:
 
-Many of these functions receive the block number as an argument, but that can easily be fetched from
-`frame_system::Pallet::<T>::block_number()`
+Many of these functions receive the block number as an argument, but that can easily be fetched from`frame_system::Pallet::<T>::block_number()`
 
----
+***
 
 ## Hooks: `on_runtime_upgrade`
 
-- Called every time the `spec_version`/`spec_name` is bumped.
-- Why would might you be interested in implementing this?
+* Called every time the `spec_version`/`spec_name` is bumped.
+* Why would might you be interested in implementing this?
 
 Notes:
 
-Because very often runtime upgrades needs to be accompanied by some kind of state migration.
+Because very often runtime upgrades needs to be accompanied by some kind of state migration.\
 Has its own lecture, more over there.
 
----
+***
 
 ## Hooks: `on_initialize`
 
-- Useful for any kind of **automatic** operation.
-- The weight you return is interpreted as `DispatchClass::Mandatory`.
+* Useful for any kind of **automatic** operation.
+* The weight you return is interpreted as `DispatchClass::Mandatory`.
 
----v
+\---v
 
 ### Hooks: `On_Initialize`
 
-- `Mandatory` Hooks should really be lightweight and predictable, with a bounded complexity.
+* `Mandatory` Hooks should really be lightweight and predictable, with a bounded complexity.
 
 ```rust
 fn on_initialize() -> Weight {
@@ -86,43 +85,37 @@ fn on_initialize() -> Weight {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### Hooks: `On_Initialize`
 
-- &shy;<!-- .element: class="fragment" --> Question: If you have 3 pallets, in which order their `on_initialize` are called?
-- &shy;<!-- .element: class="fragment" --> Question: If your runtime panics `on_initialize`, how can you recover from it?
-- &shy;<!-- .element: class="fragment" --> Question: If your `on_initialize` consumes more than the maximum block weight?
+* ­ Question: If you have 3 pallets, in which order their `on_initialize` are called?
+* ­ Question: If your runtime panics `on_initialize`, how can you recover from it?
+* ­ Question: If your `on_initialize` consumes more than the maximum block weight?
 
 Notes:
 
-- The order comes from `construct_runtime!` macro.
-- Panic in mandatory hooks is fatal error. You are pretty much done.
-- Overweight blocks using mandatory hooks, are possible, ONLY in the context of solo-chains. Such a
-  block will take longer to produce, but it eventually will. If you have your eyes set on being a
+* The order comes from `construct_runtime!` macro.
+* Panic in mandatory hooks is fatal error. You are pretty much done.
+* Overweight blocks using mandatory hooks, are possible, ONLY in the context of solo-chains. Such a\
+  block will take longer to produce, but it eventually will. If you have your eyes set on being a\
   parachain developer, you should treat overweight blocks as fatal as well.
 
----
+***
 
 ## Hooks: `on_finalize`
 
-- Extension of `on_initialize`, but at the end of the block.
-- Its weight needs to be known in advance. Therefore, less preferred compared to `on_initialize`.
+* Extension of `on_initialize`, but at the end of the block.
+* Its weight needs to be known in advance. Therefore, less preferred compared to `on_initialize`.
 
 ```rust
 fn on_finalize() {} // ✅
 fn on_finalize() -> Weight {} // ❌
 ```
 
-<!-- .element: class="fragment" -->
+* Nothing to do with _finality_ in the consensus context.
 
-- Nothing to do with _finality_ in the consensus context.
-
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### Hooks: `on_finalize`
 
@@ -132,97 +125,97 @@ Notes:
 
 Sometimes, rather than thinking "at the end of block N", consider writing code "at the beginning of block N+1"
 
----
+***
 
 ## Hooks: `poll`
 
-- The non-mandatory version of `on_initialize`.
-- In the making 👷
+* The non-mandatory version of `on_initialize`.
+* In the making 👷
 
 Notes:
 
-See: <https://github.com/paritytech/substrate/pull/14279> and related PRs
+See: [https://github.com/paritytech/substrate/pull/14279](https://github.com/paritytech/substrate/pull/14279) and related PRs
 
----
+***
 
 ## Hooks: `on_idle`
 
-- **_Optional_** variant of `on_finalize`, also executed at the end of the block.
-- Small semantical difference: executes one pallet's hook, per block, randomly, rather than all
+* _**Optional**_ variant of `on_finalize`, also executed at the end of the block.
+* Small semantical difference: executes one pallet's hook, per block, randomly, rather than all\
   pallets'.
 
----v
+\---v
 
 ## The Future: Moving Away From Mandatory Hooks
 
-- `on_initialize` -> `poll`
-- `on_finalize` -> `on_idle`
-- New primitives for multi-block migrations
-- New primitives for optional service work via extrinsics.
+* `on_initialize` -> `poll`
+* `on_finalize` -> `on_idle`
+* New primitives for multi-block migrations
+* New primitives for optional service work via extrinsics.
 
 Notes:
 
 This is all in the agenda of the FRAME team at Parity for 2023.
 
-<https://github.com/paritytech/polkadot-sdk/issues/206>
-<https://github.com/paritytech/polkadot-sdk/issues/198>
+[https://github.com/paritytech/polkadot-sdk/issues/206](https://github.com/paritytech/polkadot-sdk/issues/206)[https://github.com/paritytech/polkadot-sdk/issues/198](https://github.com/paritytech/polkadot-sdk/issues/198)
 
----
+***
 
 ## Recap: Onchain/STF Hooks
 
-<diagram class="mermaid">
-%%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true }}}%%
-graph LR
-    subgraph AfterTransactions
-        direction LR
-        OnIdle --> OnFinalize
-    end
-
-    subgraph OnChain
-        direction LR
-        Optional --> BeforeExtrinsics
-        BeforeExtrinsics --> Inherents
-        Inherents --> Poll
-        Poll --> Transactions
-        Transactions --> AfterTransactions
-    end
-
-    subgraph Optional
-
-OnRuntimeUpgrade
+%%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true \}}}%%\
+graph LR\
+subgraph AfterTransactions\
+direction LR\
+OnIdle --> OnFinalize\
 end
 
-    subgraph BeforeExtrinsics
-        OnInitialize
-    end
+```
+subgraph OnChain
+    direction LR
+    Optional --> BeforeExtrinsics
+    BeforeExtrinsics --> Inherents
+    Inherents --> Poll
+    Poll --> Transactions
+    Transactions --> AfterTransactions
+end
 
-    subgraph Transactions
-        Transaction1 --> UnsignedTransaction2 --> Transaction3
-    end
+subgraph Optional
+```
 
-    subgraph Inherents
-        Inherent1 --> Inherent2
-    end
+OnRuntimeUpgrade\
+end
 
-</diagram>
+```
+subgraph BeforeExtrinsics
+    OnInitialize
+end
+
+subgraph Transactions
+    Transaction1 --> UnsignedTransaction2 --> Transaction3
+end
+
+subgraph Inherents
+    Inherent1 --> Inherent2
+end
+```
 
 Notes:
 
 implicit in this:
 
-Inherents are only first, which was being discussed: <https://github.com/polkadot-fellows/RFCs/pull/13>
+Inherents are only first, which was being discussed: [https://github.com/polkadot-fellows/RFCs/pull/13](https://github.com/polkadot-fellows/RFCs/pull/13)
 
----
+***
 
 ## Hooks: `genesis_build`
 
-- Means for each pallet to specify a $f(input): state$ at genesis.
-- This is called only once, by the client, when you **create a new chain**.
-  - &shy;<!-- .element: class="fragment" --> Is this invoked every time you run `cargo run`?
-- `#[pallet::genesis_build]`.
+* Means for each pallet to specify a $f(input): state$ at genesis.
+* This is called only once, by the client, when you **create a new chain**.
+  * ­ Is this invoked every time you run `cargo run`?
+* `#[pallet::genesis_build]`.
 
----v
+\---v
 
 ### Hooks: `genesis_build`
 
@@ -234,8 +227,6 @@ pub struct GenesisConfig<T: Config> {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
 ```rust
 impl<T: Config> Default for GenesisConfig<T> {
   fn default() -> Self {
@@ -243,8 +234,6 @@ impl<T: Config> Default for GenesisConfig<T> {
   }
 }
 ```
-
-<!-- .element: class="fragment" -->
 
 ```rust
 #[pallet::genesis_build]
@@ -255,13 +244,11 @@ impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### Hooks: `genesis_build`
 
-- `GenesisConfig` is a composite/amalgamated item at the top level runtime.
+* `GenesisConfig` is a composite/amalgamated item at the top level runtime.
 
 ```rust
 construct_runtime!(
@@ -279,53 +266,51 @@ struct RuntimeGenesisConfig {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
 Notes:
 
-<https://paritytech.github.io/substrate/master/node_template_runtime/struct.RuntimeGenesisConfig.html>
+[https://paritytech.github.io/substrate/master/node\_template\_runtime/struct.RuntimeGenesisConfig.html](https://paritytech.github.io/substrate/master/node_template_runtime/struct.RuntimeGenesisConfig.html)
 
----v
+\---v
 
 ### Hooks: `genesis_build`
 
-- Recent changes moving `genesis_build` to be used over a runtime API, rather than native runtime.
-- `#[cfg(feature = "std")]` in pallets will go away.
+* Recent changes moving `genesis_build` to be used over a runtime API, rather than native runtime.
+* `#[cfg(feature = "std")]` in pallets will go away.
 
 Notes:
 
-<https://github.com/paritytech/polkadot-sdk/issues/25>
+[https://github.com/paritytech/polkadot-sdk/issues/25](https://github.com/paritytech/polkadot-sdk/issues/25)
 
----
+***
 
 ## Hooks: `offchain_worker`
 
 **Fully offchain application**:
 
-- Read chain state via RPC.
-- submit desired side effects back to the chain as transactions.
+* Read chain state via RPC.
+* submit desired side effects back to the chain as transactions.
 
 **Runtime Offchain Worker**:
 
-- &shy;<!-- .element: class="fragment" --> Code lives onchain, upgradable only in synchrony with the whole runtime 👎
-- &shy;<!-- .element: class="fragment" --> Ergonomic and fast state access 👍
-- &shy;<!-- .element: class="fragment" --> State writes are ignored 🤷
-- &shy;<!-- .element: class="fragment" --> Can submit transactions back to the chain as well ✅
-- &shy;<!-- .element: class="fragment" --> Source of many confusions!
+* ­ Code lives onchain, upgradable only in synchrony with the whole runtime 👎
+* ­ Ergonomic and fast state access 👍
+* ­ State writes are ignored 🤷
+* ­ Can submit transactions back to the chain as well ✅
+* ­ Source of many confusions!
 
 Notes:
 
-People have often thought that they can do magic with things with OCW, please don't. BIG warning to
+People have often thought that they can do magic with things with OCW, please don't. BIG warning to\
 founders to be careful with this!
 
-<https://paritytech.github.io/substrate/master/pallet_examples/index.html>
+[https://paritytech.github.io/substrate/master/pallet\_examples/index.html](https://paritytech.github.io/substrate/master/pallet_examples/index.html)
 
----v
+\---v
 
 ### Hooks: `offchain_worker`
 
-- Execution entirely up to the client.
-- Has a totally separate thread pool than the normal execution.
+* Execution entirely up to the client.
+* Has a totally separate thread pool than the normal execution.
 
 ```
 --offchain-worker <ENABLED>
@@ -342,30 +327,27 @@ founders to be careful with this!
     - native-else-wasm:
 ```
 
----v
+\---v
 
 ### Hooks: `offchain_worker`
 
-- Threads can **overlap**, each is reading the state of its corresponding block
+* Threads can **overlap**, each is reading the state of its corresponding block
 
-<img style="height: 500px" src="./img/ocw.svg"  />
-
-<!-- .element: class="fragment" -->
+![](img/ocw.svg)
 
 Notes:
 
-<https://paritytech.github.io/substrate/master/sp_runtime/offchain/storage_lock/index.html>
+[https://paritytech.github.io/substrate/master/sp\_runtime/offchain/storage\_lock/index.html](https://paritytech.github.io/substrate/master/sp_runtime/offchain/storage_lock/index.html)
 
----v
+\---v
 
 ### Hooks: `offchain_worker`
 
-- &shy;<!-- .element: class="fragment" -->Offchain workers have their own **special host
-  functions**: http, dedicated storage, time, etc.
-- &shy;<!-- .element: class="fragment" -->Offchain workers have the same **execution limits** as
+* ­Offchain workers have their own **special host**\
+  **functions**: http, dedicated storage, time, etc.
+* ­Offchain workers have the same **execution limits** as\
   Wasm (limited memory, custom allocator).
-
-- &shy;<!-- .element: class="fragment" -->Source of confusion, why OCWs cannot write to state.
+* ­Source of confusion, why OCWs cannot write to state.
 
 Notes:
 
@@ -373,20 +355,18 @@ These are the source of the confusion.
 
 Word on allocator limit in Substrate Wasm execution (subject to change).
 
-- Max single allocation limited
-- Max total allocation limited.
+* Max single allocation limited
+* Max total allocation limited.
 
----
+***
 
 ## Hooks: `integrity_test`
 
-- Put into a test by `construct_runtime!`.
+* Put into a test by `construct_runtime!`.
 
 ```rust
 __construct_runtime_integrity_test::runtime_integrity_tests
 ```
-
-<!-- .element: class="fragment" -->
 
 ```rust
 fn integrity_test() {
@@ -399,87 +379,85 @@ fn integrity_test() {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
 Notes:
 
 I am in fan of renaming this. If you are too, please comment here
 
----
+***
 
 ## Hooks: `try_state`
 
-- A means for you to ensure correctness of your $STF$, after each transition.
-- &shy;<!-- .element: class="fragment" -->Entirely offchain, custom runtime-apis, conditional
+* A means for you to ensure correctness of your $STF$, after each transition.
+* ­Entirely offchain, custom runtime-apis, conditional\
   compilation.
-  - &shy;<!-- .element: class="fragment" -->Called from `try-runtime-cli`, which you will learn about next week, or anyone else
-- &shy;<!-- .element: class="fragment" -->Examples from your assignment?
+  * ­Called from `try-runtime-cli`, which you will learn about next week, or anyone else
+* ­Examples from your assignment?
 
 Notes:
 
 What is a transition? Either a block, or single extrinsic
 
----
+***
 
 ## Hooks: Recap
 
-<diagram class="mermaid">
-%%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true }}}%%
-graph LR
-    subgraph Offchain
-        OffchainWorker
-        TryState
-    end
-
-    subgraph Genesis
-        GenesisBuild
-    end
-
-    subgraph AfterTransactions
-        direction LR
-        OnIdle --> OnFinalize
-    end
-
-    subgraph OnChain
-        direction LR
-        Optional --> BeforeExtrinsics
-        BeforeExtrinsics --> Inherents
-        Inherents --> Poll
-        Poll --> Transactions
-        Transactions --> AfterTransactions
-    end
-
-    subgraph Optional
-
-OnRuntimeUpgrade
+%%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true \}}}%%\
+graph LR\
+subgraph Offchain\
+OffchainWorker\
+TryState\
 end
 
-    subgraph BeforeExtrinsics
-        OnInitialize
-    end
+```
+subgraph Genesis
+    GenesisBuild
+end
 
-    subgraph Transactions
-        Transaction1 --> UnsignedTransaction2 --> Transaction3
-    end
+subgraph AfterTransactions
+    direction LR
+    OnIdle --> OnFinalize
+end
 
-    subgraph Inherents
-        Inherent1 --> Inherent2
-    end
+subgraph OnChain
+    direction LR
+    Optional --> BeforeExtrinsics
+    BeforeExtrinsics --> Inherents
+    Inherents --> Poll
+    Poll --> Transactions
+    Transactions --> AfterTransactions
+end
 
-</diagram>
+subgraph Optional
+```
 
-- What other hooks can you think of?
+OnRuntimeUpgrade\
+end
+
+```
+subgraph BeforeExtrinsics
+    OnInitialize
+end
+
+subgraph Transactions
+    Transaction1 --> UnsignedTransaction2 --> Transaction3
+end
+
+subgraph Inherents
+    Inherent1 --> Inherent2
+end
+```
+
+* What other hooks can you think of?
 
 Notes:
 
 What other ideas you can think of?
 
-- a hook called once a pallet is first initialized.
-  <https://github.com/paritytech/polkadot-sdk/issues/109>
-- Local on Post/Pre dispatch: <https://github.com/paritytech/polkadot-sdk/issues/261>
-- Global on Post/Pre dispatch is in fact a signed extension. It has to live in the runtime, because you have to specify order.
+* a hook called once a pallet is first initialized.[https://github.com/paritytech/polkadot-sdk/issues/109](https://github.com/paritytech/polkadot-sdk/issues/109)
+* Local on Post/Pre dispatch: [https://github.com/paritytech/polkadot-sdk/issues/261](https://github.com/paritytech/polkadot-sdk/issues/261)
+* Global on Post/Pre dispatch is in fact a signed extension. It has to live in the runtime, because you have to specify order.
 
----
+***
 
 ## Additional Resources! 😋
 
@@ -489,7 +467,7 @@ Notes:
 
 ## Post lecture Notes
 
-Regarding this drawback to offchain workers that you can only upgrade in cadence with the network.
-Offchain worker, like tx-pool api, is only called from an offchain context. Node operators can
-easily use the runtime overrides feature to change the behavior of their offchain worker anytime
+Regarding this drawback to offchain workers that you can only upgrade in cadence with the network.\
+Offchain worker, like tx-pool api, is only called from an offchain context. Node operators can\
+easily use the runtime overrides feature to change the behavior of their offchain worker anytime\
 they want.

@@ -1,21 +1,21 @@
 ---
 title: XCM Pallet
-description: Introduction to `pallet-xcm`, its interface and features implemented here.
 duration: 1 hour
+description: Introduction to `pallet-xcm`, its interface and features implemented here.
 ---
 
 # XCM Pallet
 
----
+***
 
 #### Lesson goals:
 
-- Understand what the interface of the pallet is and its implementation.
-- How versioning discovery works.
-- How receiving responses work.
-- Understand how to craft XCM in FRAME pallets.
+* Understand what the interface of the pallet is and its implementation.
+* How versioning discovery works.
+* How receiving responses work.
+* Understand how to craft XCM in FRAME pallets.
 
----
+***
 
 ## The XCM pallet
 
@@ -25,7 +25,7 @@ The XCM pallet is the bridge between the XCVM subsystem and the FRAME subsystem.
 
 **It also allows us to send/execute XCM and interact with the XCM executor**.
 
----
+***
 
 ## How XCM is expected to be used
 
@@ -39,30 +39,26 @@ How do wallets wallet providers use XCM ?
 
 We will see examples of XCM being built in the runtime when exploring `teleport_assets` and `reserve_transfer_assets` extrinsics.
 
----
+***
 
 ### Key roles of `pallet-xcm`
 
-<pba-flex center>
-
-1. Allows to interact with the `xcm-executor` by executing xcm messages.
+1. Allows to interact with the `xcm-executor` by executing xcm messages.\
    These can be filtered through the `XcmExecuteFilter`.
-1. Allows sending arbitrary messages to other chains for certain origins.
+2. Allows sending arbitrary messages to other chains for certain origins.\
    The origins that are allowed to send message can be filtered through `SendXcmOrigin`.
-1. Provides an easier interface to do reserve based transfers and teleports.
+3. Provides an easier interface to do reserve based transfers and teleports.\
    The origins capable of doing these actions can be filtered by `XcmTeleportFilter` and `XcmReserveTransferFilter`.
-1. Handles XCM version negotiation duties.
-1. Handles asset-trap/claim duties.
-1. And other state based requirements of the XCVM.
-
-</pba-flex>
+4. Handles XCM version negotiation duties.
+5. Handles asset-trap/claim duties.
+6. And other state based requirements of the XCVM.
 
 Notes:
 
-- Even when the XCM pallet allows any FRAME origin to send XCMs, it distinguishes root calls vs any other origin calls.
+* Even when the XCM pallet allows any FRAME origin to send XCMs, it distinguishes root calls vs any other origin calls.\
   In the case of the latter, it appends the `DescendOrigin` instruction to make sure non-root origins cannot act on behalf of the parachain.
 
----
+***
 
 ## The XCM Pallet
 
@@ -70,79 +66,67 @@ Notes:
 
 `pallet-xcm` also provides an interface containing 10 different extrinsics, which can be split into three categories:
 
-- Primitive functions to locally `execute` or `send` an XCM.
-- High-level functions for asset transfers between systems, e.g. teleportation and reserve asset transfers.
-- Extrinsics aimed exclusively at version negotiation.
+* Primitive functions to locally `execute` or `send` an XCM.
+* High-level functions for asset transfers between systems, e.g. teleportation and reserve asset transfers.
+* Extrinsics aimed exclusively at version negotiation.
 
----
+***
 
 ## `pallet-xcm` Primitive extrinsics
 
-- `execute`
+*   `execute`
 
-  Direct access to the XCM executor.
-  Executed on behalf of FRAME's signed origin.
+    Direct access to the XCM executor.\
+    Executed on behalf of FRAME's signed origin.
 
-<diagram class="mermaid limit size-40">
-flowchart TD
-subgraph paraA[Parachain A              .]
-  executor --"success?"--> palletxcm
-  palletxcm("pallet-xcm") --"execute"--> executor("xcm-executor")
-end
+flowchart TD\
+subgraph paraA\[Parachain A              .]\
+executor --"success?"--> palletxcm\
+palletxcm("pallet-xcm") --"execute"--> executor("xcm-executor")\
+end\
 execute("execute(xcm)") --> palletxcm
-</diagram>
 
 Notes:
 
-It checks the origin to ensure that the configured `SendXcmOrigin` filter is not blocking the execution.
+It checks the origin to ensure that the configured `SendXcmOrigin` filter is not blocking the execution.\
 It executes the message **locally** and returns the outcome as an event.
 
----v
+\---v
 
 ## `pallet-xcm` Primitive extrinsics
 
-- `send`
+* `send`
 
 Sends a message to the provided destination.
 
-<diagram class="mermaid" style="display: flex; width: 150%; justify-content: center; transform: translateX(-17%);">
-flowchart LR
-subgraph paraA[Parachain A]
-  palletxcma("pallet-xcm") --"deliver"--> routera("xcm-router")
-  routera --> mqueuea("message queue")
-end
-subgraph paraB[Parachain B]
-mqueueb("message queue") --> executorb("xcm-executor")
-end
-send("send(xcm)") --> palletxcma
+flowchart LR\
+subgraph paraA\[Parachain A]\
+palletxcma("pallet-xcm") --"deliver"--> routera("xcm-router")\
+routera --> mqueuea("message queue")\
+end\
+subgraph paraB\[Parachain B]\
+mqueueb("message queue") --> executorb("xcm-executor")\
+end\
+send("send(xcm)") --> palletxcma\
 mqueuea --> mqueueb
-</diagram>
 
 Notes:
 
-This extrinsic is a function to send a message to a destination.
-It checks the origin, the destination and the message.
+This extrinsic is a function to send a message to a destination.\
+It checks the origin, the destination and the message.\
 Then it lets the `XcmRouter` handle the forwarding of the message.
 
----
+***
 
 ## `pallet-xcm` Asset Transfer extrinsics
 
-<pba-cols>
-<pba-col>
-<img rounded style="width: 400px;" src="../intro/img/teleport.png" />
-</pba-col>
-
-<pba-col>
-<img rounded style="width: 400px;" src="../intro/img/reserve-tx.png" />
-</pba-col>
-</pba-cols>
+![](../intro/img/teleport.png)![](../intro/img/reserve-tx.png)
 
 Notes:
 
 We have already seen what teleports and reserve transfers mean in lesson 7.1; A quick reminder.
 
----v
+\---v
 
 ## `pallet-xcm` Asset Transfer extrinsics
 
@@ -150,49 +134,40 @@ We have already seen what teleports and reserve transfers mean in lesson 7.1; A 
 
 This extrinsic allows the user to perform an asset teleport.
 
-<diagram class="mermaid">
-flowchart LR
-subgraph paraA[Parachain A]
-  palletxcma("pallet-xcm") --"1. execute"--> executora("xcm-executor")
-  executora --"send"--> sendera("xcm-sender")
-end
-subgraph tdestination[Trusted Destination]
-end
-lteleport("limited_teleport_assets(\n  dest,\n  beneficiary,\n  assets,\n  fee_asset_item,\n  weight_limit\n)"):::left --> palletxcma
-sendera --"2."--> tdestination
+flowchart LR\
+subgraph paraA\[Parachain A]\
+palletxcma("pallet-xcm") --"1. execute"--> executora("xcm-executor")\
+executora --"send"--> sendera("xcm-sender")\
+end\
+subgraph tdestination\[Trusted Destination]\
+end\
+lteleport("limited\_teleport\_assets(\n  dest,\n  beneficiary,\n  assets,\n  fee\_asset\_item,\n  weight\_limit\n)"):::left --> palletxcma\
+sendera --"2."--> tdestination\
 classDef left text-align:left
-</diagram>
 
----v
+\---v
 
 ### `limited_teleport_assets`
 
-<ol>
+1. `pallet-xcm` composes the following XCM and passes it to `xcm‑executor`
+2. ```rust
+   Xcm(vec![
+     WithdrawAsset(assets),
+     SetFeesMode {jit_withdraw: true},
+     InitiateTeleport {assets: Wild(AllCounted(max_assets)), dest, xcm},
+   ])
+   ```
+3. Parachain A then sends the following message to the trusted destination
+4. ```rust
+   Xcm(vec![
+     ReceiveTeleportedAsset(assets),
+     ClearOrigin,
+     BuyExecution { fees, weight_limit },
+     DepositAsset { assets: Wild(AllCounted(max_assets)), beneficiary },
+   ])
+   ```
 
-<li> <code>pallet-xcm</code> composes the following XCM and passes it to <code>xcm&#8209;executor</code></li>
-
-```rust
-Xcm(vec![
-  WithdrawAsset(assets),
-  SetFeesMode {jit_withdraw: true},
-  InitiateTeleport {assets: Wild(AllCounted(max_assets)), dest, xcm},
-])
-```
-
-<li>Parachain A then sends the following message to the trusted destination</li>
-
-```rust
-Xcm(vec![
-  ReceiveTeleportedAsset(assets),
-  ClearOrigin,
-  BuyExecution { fees, weight_limit },
-  DepositAsset { assets: Wild(AllCounted(max_assets)), beneficiary },
-])
-```
-
-</ol>
-
----v
+\---v
 
 ## `pallet-xcm` Asset Transfer extrinsics
 
@@ -200,48 +175,39 @@ Xcm(vec![
 
 Allow the user to perform a reserve-backed transfer from the reserve chain to the destination.
 
-<diagram class="mermaid" style="display: flex; width: 150%; justify-content: center; transform: translateX(-17%);">
-flowchart LR
-subgraph reserve[Reserve Chain]
-  palletxcma("pallet-xcm") --"1. execute"--> executora("xcm-executor")
-  executora --"send"--> sendera("xcm-sender")
-end
-subgraph destination[Destination]
-end
-lteleport("limited_reserve_transfer_assets(\n  dest,\n  beneficiary,\n  assets,\n  fee_asset_item,\n  weight_limit\n)"):::left --> palletxcma
-sendera --"2."--> destination
+flowchart LR\
+subgraph reserve\[Reserve Chain]\
+palletxcma("pallet-xcm") --"1. execute"--> executora("xcm-executor")\
+executora --"send"--> sendera("xcm-sender")\
+end\
+subgraph destination\[Destination]\
+end\
+lteleport("limited\_reserve\_transfer\_assets(\n  dest,\n  beneficiary,\n  assets,\n  fee\_asset\_item,\n  weight\_limit\n)"):::left --> palletxcma\
+sendera --"2."--> destination\
 classDef left text-align:left
-</diagram>
 
----v
+\---v
 
 ### `limited_reserve_transfer_assets`
 
-<ol>
+1. `pallet-xcm` composes the following XCM and passes it to `xcm‑executor`
+2. ```rust
+   Xcm(vec![
+     SetFeesMode { jit_withdraw: true },
+     TransferReserveAsset { assets, dest, xcm },
+   ])
+   ```
+3. Reserve Chain then sends the following mesasge to the destination
+4. ```rust
+   Xcm(vec![
+     ReserveAssetDeposited(assets),
+     ClearOrigin,
+     BuyExecution { fees, weight_limit },
+     DepositAsset { assets: Wild(AllCounted(max_assets)), beneficiary },
+   ])
+   ```
 
-<li> <code>pallet-xcm</code> composes the following XCM and passes it to <code>xcm&#8209;executor</code></li>
-
-```rust
-Xcm(vec![
-  SetFeesMode { jit_withdraw: true },
-  TransferReserveAsset { assets, dest, xcm },
-])
-```
-
-<li>Reserve Chain then sends the following mesasge to the destination</li>
-
-```rust
-Xcm(vec![
-  ReserveAssetDeposited(assets),
-  ClearOrigin,
-  BuyExecution { fees, weight_limit },
-  DepositAsset { assets: Wild(AllCounted(max_assets)), beneficiary },
-])
-```
-
-</ol>
-
----
+***
 
 ## 🗣️ version negotiation with `pallet-xcm`
 
@@ -250,8 +216,6 @@ XCM is a **versioned message format**.
 One version may contain more or different instructions than another, so for parties to communicate via XCM, it is important to know which version the other party is using.
 
 The version subscription mechanism allows parties to subscribe to version updates from others.
-
-<pba-flex center>
 
 ```rust
 pub enum VersionedXcm {
@@ -262,16 +226,13 @@ pub enum VersionedXcm {
 
 Notes:
 
-- V0 and V1 were removed with the addition of XCM v3.
+* V0 and V1 were removed with the addition of XCM v3.
 
----v
+\---v
 
-## 🗣️ version negotiation with `pallet-xcm`
+### 🗣️ version negotiation with `pallet-xcm`
 
-But chains need to be aware of the version supported by each other.
-`SubscribeVersion` and `QueryResponse` play a key role here:
-
-<pba-flex center>
+But chains need to be aware of the version supported by each other.`SubscribeVersion` and `QueryResponse` play a key role here:
 
 ```rust
 enum Instruction {
@@ -291,17 +252,15 @@ enum Instruction {
 
 Notes:
 
-- `query_id` would be identical in the `SubscribeVersion` and `QueryResponse` instructions.
-- Likewise, `max_response_weight` should also match `max_weight` in the response
+* `query_id` would be identical in the `SubscribeVersion` and `QueryResponse` instructions.
+* Likewise, `max_response_weight` should also match `max_weight` in the response
 
----v
+\---v
 
-## 🗣️ version negotiation with `pallet-xcm`
+### 🗣️ version negotiation with `pallet-xcm`
 
-- `ResponseHandler`: The component in charge of handling response messages from other chains.
-- `SubscriptionService`: The component in charge of handling version subscription notifications to other chains
-
-<pba-flex center>
+* `ResponseHandler`: The component in charge of handling response messages from other chains.
+* `SubscriptionService`: The component in charge of handling version subscription notifications to other chains
 
 ```rust
 impl Config for XcmConfig {
@@ -313,91 +272,82 @@ impl Config for XcmConfig {
 
 Notes:
 
-- `PalletXcm` keeps track of the versions of each chain when it receives a response.
-- It also keeps track of which chains it needs to notify whenever we change our version
+* `PalletXcm` keeps track of the versions of each chain when it receives a response.
+* It also keeps track of which chains it needs to notify whenever we change our version
 
----
+***
 
-## Subscription Service
+### Subscription Service
 
-Any system can be notified of when another system changes its latest supported XCM version.
+Any system can be notified of when another system changes its latest supported XCM version.\
 This is done via the `SubscribeVersion` and `UnsubscribeVersion` instructions.
 
 The `SubscriptionService` type defines what action to take when processing a `SubscribeVersion` instruction.
 
 Notes:
 
-`pallet-xcm` provides a default implementation of this trait.
+`pallet-xcm` provides a default implementation of this trait.\
 When receiving a `SubscribeVersion`, the chain sends back an XCM with the `QueryResponse` instruction containing its current version.
 
----
+***
 
-## Version Negotiation
+### Version Negotiation
 
 The subscription service leverages any kind of exchange of XCMs between two systems to begin the process of version negotiation.
 
-Each time a system needs to send a message to a destination with an unknown supported XCM version, its location will be stored in the `VersionDiscoveryQueue`.
+Each time a system needs to send a message to a destination with an unknown supported XCM version, its location will be stored in the `VersionDiscoveryQueue`.\
 This queue will then be checked in the next block and `SubscribeVersion` instructions will be sent out to those locations present in the queue.
 
 Notes:
 
-SubscribeVersion - instructs the local system to notify the sender whenever the former has its XCM version upgraded or downgraded.
+SubscribeVersion - instructs the local system to notify the sender whenever the former has its XCM version upgraded or downgraded.\
 UnsubscribeVersion - if the sender was previously subscribed to XCM version change notifications for the local system, then this instruction tells the local system to stop notifying the sender on version changes.
 
----v
+\---v
 
-## 🗣️ XCM Version Negotiation
+### 🗣️ XCM Version Negotiation
 
 XCM version negotiation:
-<pba-flex center>
 
 1. Chain A sends `SubscribeVersion` to chain B.
-1. Chain B responds `QueryResponse` to chain A with the same query_id and max_weight params, and puts the XCM version in the response
-1. Chain A stores chain B's supported version on storage.
-1. The same procedure happens from chain B to chain A.
-1. Communication is established using the highest mutually supported version.
+2. Chain B responds `QueryResponse` to chain A with the same query\_id and max\_weight params, and puts the XCM version in the response
+3. Chain A stores chain B's supported version on storage.
+4. The same procedure happens from chain B to chain A.
+5. Communication is established using the highest mutually supported version.
 
----v
+\---v
 
-## 🗣️ XCM Version Negotiation
+### 🗣️ XCM Version Negotiation
 
 In the following scenario Chain A is using XCM v2
 
-<diagram class="mermaid limit size-80">
-flowchart BT
-subgraph registryA[Chain A's Registry]
-  chainB("Chain B \n\n v2")
-  chainC("Chain C \n\n v3")
-  chainD("Chain D \n\n v1")
-  chainE("Chain E \n\n v3")
-end
-</diagram>
-
-<diagram class="mermaid limit size-70">
-flowchart LR
+flowchart BT\
+subgraph registryA\[Chain A's Registry]\
+chainB("Chain B \n\n v2")\
+chainC("Chain C \n\n v3")\
+chainD("Chain D \n\n v1")\
+chainE("Chain E \n\n v3")\
+endflowchart LR\
 chainARequest("Chain A") --"Chain E ? \n\n v2"--> chainERequest("Chain E")
-</diagram>
 
----
+***
 
-## Response Handler
+### Response Handler
 
-Version negotiation is just one example among many kinds of queries one chain can make to another.
+Version negotiation is just one example among many kinds of queries one chain can make to another.\
 Regardless of which kind of query was made, the response usually takes the form of a `QueryResponse` instruction.
 
----v
+\---v
 
-## Response Handler
+### Response Handler
 
 We have talked about XCM being asymmetric, so why are there responses ?
 
----v
+\---v
 
-## Information Reporting
+### Information Reporting
 
 Every instruction used for information reporting contains `QueryResponseInfo`.
-
-<pba-flex center>
 
 ```rust
 pub struct QueryResponseInfo {
@@ -409,14 +359,12 @@ pub struct QueryResponseInfo {
 
 Notes:
 
-All Information Reporting instructions contain a `QueryResponseInfo` struct, which contains information about the intended destination of the response, the ID of the query, and the maximum weight that the dispatchable call function can use.
+All Information Reporting instructions contain a `QueryResponseInfo` struct, which contains information about the intended destination of the response, the ID of the query, and the maximum weight that the dispatchable call function can use.\
 The dispatchable call function is an optional operation that XCM author can specify, and is executed upon receiving the response, effectively acting as a lifecycle hook on response.
 
----v
+\---v
 
-## Information retrieval
-
-<pba-flex center>
+### Information retrieval
 
 ```rust
 enum Instruction {
@@ -433,12 +381,11 @@ enum Instruction {
 
 Notes:
 
-The above instruction is the one used for offering some requested information that the local system is expecting.
-`querier` parameter should be checked to ensure that the system that requested the information matches with what is expected.
+The above instruction is the one used for offering some requested information that the local system is expecting.`querier` parameter should be checked to ensure that the system that requested the information matches with what is expected.
 
----
+***
 
-## Asset Trap/Claims with `pallet-xcm`
+### Asset Trap/Claims with `pallet-xcm`
 
 What happens when there are still funds in the holding register after the execution of every instruction is done?
 
@@ -448,40 +395,39 @@ These traps need to be **stored** to allow for future claiming of these trapped 
 
 Notes:
 
-- This is handled in the `post_execute` function of the xcm-executor.
+* This is handled in the `post_execute` function of the xcm-executor.
 
----v
+\---v
 
-## Asset Trap/Claims with `pallet-xcm`
+### Asset Trap/Claims with `pallet-xcm`
 
-- **`pallet-xcm` asset trapper**: Trapped assets are stored in the `AssetTraps` storage item and indexed by origin and assets
-
-- **`pallet-xcm` asset claimer**: `pallet-xcm` also allows for claiming trapped assets, providing that:
-  - the origin claiming the assets is identical to the one that trapped them.
-  - the `Asset` being claimed is identical to the one that was trapped
+* **`pallet-xcm` asset trapper**: Trapped assets are stored in the `AssetTraps` storage item and indexed by origin and assets
+* **`pallet-xcm` asset claimer**: `pallet-xcm` also allows for claiming trapped assets, providing that:
+  * the origin claiming the assets is identical to the one that trapped them.
+  * the `Asset` being claimed is identical to the one that was trapped
 
 Notes:
 
-- Each map element on `AssetTraps` holds a counter of how many times such origin has trapped such `Asset`.
-- Every time such `Asset` gets reclaimed, the counter decrements by one.
+* Each map element on `AssetTraps` holds a counter of how many times such origin has trapped such `Asset`.
+* Every time such `Asset` gets reclaimed, the counter decrements by one.
 
----
+***
 
-## Extrinsic breakdown
+### Extrinsic breakdown
 
 Let's jump into the code and have a look at `limited_teleport_assets` extrinsic.
 
 [source 🔍](https://github.com/paritytech/polkadot-sdk/blob/342d720/polkadot/xcm/pallet-xcm/src/lib.rs#L1099)
 
----
+***
 
-## Summary
+### Summary
 
 In this lecture, we learnt:
 
-- What the XCM pallet is and what it's used for.
-- How XCM is intended to be used, both by wallet and runtime developers.
-- The useful extrinsics in the XCM pallet.
-- How XCM versioning works.
-- How the XCM pallet is used to receive responses.
-- How assets might be trapped and how to use the XCM pallet to claim them.
+* What the XCM pallet is and what it's used for.
+* How XCM is intended to be used, both by wallet and runtime developers.
+* The useful extrinsics in the XCM pallet.
+* How XCM versioning works.
+* How the XCM pallet is used to receive responses.
+* How assets might be trapped and how to use the XCM pallet to claim them.

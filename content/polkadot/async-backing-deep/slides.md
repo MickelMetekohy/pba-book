@@ -1,10 +1,14 @@
 ---
 title: Deep Dive, Asynchronous Backing
-description: Decoupling Backing and Inclusion Through Advance Work Based on Happy Path Assumptions
 duration: 1 hour
+description: >-
+  Decoupling Backing and Inclusion Through Advance Work Based on Happy Path
+  Assumptions
 ---
 
 # Deep Dive, Asynchronous Backing
+
+## Deep Dive, Asynchronous Backing
 
 Notes:
 
@@ -14,140 +18,114 @@ This lecture covers asynchronous backing, the new feature with potential to deli
 
 Lets get to it
 
----
+***
 
-## Overview
+### Overview
 
-<pba-flex center>
+* Async Backing Motivation
+* Laying the Groundwork, Contextual Execution of Parablocks
+* Prospective Parachains, Storing Products of the Backing Process
+* Supporting Changes
+* Async Backing Advantages, Current and Future
 
-- Async Backing Motivation
-- Laying the Groundwork, Contextual Execution of Parablocks
-- Prospective Parachains, Storing Products of the Backing Process
-- Supporting Changes
-- Async Backing Advantages, Current and Future
+***
 
-</pba-flex>
+## Async Backing Motivation
 
----
+***
 
-<!-- .slide: data-background-color="#4A2439" -->
+### Terminology: Backable vs Backed
 
-# Async Backing Motivation
-
----
-
-## Terminology: Backable vs Backed
-
-<pba-flex center>
-
-- Backable candidate:
-  - Output of the off-chain backing process
-  - Received a quorum of "valid" votes from its backing group
-- Backed candidate:
-  - A backable candidate that has been placed on-chain
-  - Also termed "pending availability"
-
-</pba-flex>
+* Backable candidate:
+  * Output of the off-chain backing process
+  * Received a quorum of "valid" votes from its backing group
+* Backed candidate:
+  * A backable candidate that has been placed on-chain
+  * Also termed "pending availability"
 
 Notes:
 
-We avoid backing any candidate on the relay chain unless we know there is room for that candidate in the availability process.
+We avoid backing any candidate on the relay chain unless we know there is room for that candidate in the availability process.\
 To do otherwise risks wasted on-chain work.
 
 When a candidate is backed on-chain it immediately occupies an availability core and enters the availability, or erasure coding, process.
 
----
+***
 
-## Synchronous Backing
+### Synchronous Backing
 
-<img rounded style="width: 1500px" src="../async-backing-shallow/img/async_backing_3.svg" />
+![](../async-backing-shallow/img/async_backing_3.svg)
 
 Note:
 
 Can anyone spot a problem with synchronous model?
 
-- Problem 1
+* Problem 1
+  * Can only start work on new parablock when prior is included
+  * One relay block for backing, one for inclusion
+  * Minimum block time of 12 seconds
+* Problem 2
+  * Minimal time to submit collation for 12 second total block time
+  * About .5 seconds
+  * Not enough to fill block fully
 
-  - Can only start work on new parablock when prior is included
-  - One relay block for backing, one for inclusion
-  - Minimum block time of 12 seconds
+***
 
-- Problem 2
-  - Minimal time to submit collation for 12 second total block time
-  - About .5 seconds
-  - Not enough to fill block fully
+### Asynchronous Backing
 
----
-
-## Asynchronous Backing
-
-<img rounded style="width: 1500px" src="../async-backing-shallow/img/async_backing_3.svg" />
+![](../async-backing-shallow/img/async_backing_3.svg)
 
 Notes:
 
-- Point out the two independent processes and the "stopping points between them"
-- Walk through, starting with unincluded segment
+* Point out the two independent processes and the "stopping points between them"
+* Walk through, starting with unincluded segment
 
----
+***
 
-## The Async Backing Reasonable Collator Assumptions
-
-<pba-flex center>
+### The Async Backing Reasonable Collator Assumptions
 
 1. "The best existing parablock I'm aware of will eventually be included in the relay chain."
-1. "There won't be a chain reversion impacting that best parablock."
+2. "There won't be a chain reversion impacting that best parablock."
 
-</pba-flex>
+\
+\
 
-<br />
-<br />
 
 > The Stakes Are Low
 
 Notes:
 
-Best is determined by a process similar to the BABE fork choice rule.
+Best is determined by a process similar to the BABE fork choice rule.\
 Brief BABE fork choice rule review
 
----
+***
 
-<!-- .slide: data-background-color="#4A2439" -->
+## Contextual Execution of Parablocks
 
-# Contextual Execution of Parablocks
+***
 
----
+### Async Backing Execution Context
 
-## Async Backing Execution Context
+* From relay chain
+  * Base constraints
+  * Relay parent
+* From unincluded segment
+  * Constraint modifications
+  * Required parent
 
-<pba-cols>
-<pba-col center>
-
-- From relay chain
-  - Base constraints
-  - Relay parent
-- From unincluded segment
-  - Constraint modifications
-  - Required parent
-
-</pba-col>
-<pba-col>
-
-<img rounded style="width: 500px" src="./img/context.jpeg" />
-
-</pba-col>
-</pba-cols>
+![](img/context.jpeg)
 
 Notes:
 
-- How it was before:
-  - Required parent included in relay parent
-  - No need for constraint modifications
-- Relay parent vs required parent
-- Base constraints vs modifications
+* How it was before:
+  * Required parent included in relay parent
+  * No need for constraint modifications
+* Relay parent vs required parent
+* Base constraints vs modifications
 
----
+***
 
-## Constraints and Modifications
+### Constraints and Modifications
 
 ```rust
 pub struct Constraints {
@@ -206,69 +184,63 @@ Notes:
 
 Constraints to Highlight:
 
-- required_parent: Fragment would place its corresponding candidate here for children
-- min_relay_parent_number: Monotonically increasing rule, max_ancestry_len
-- ump_messages_sent mods ump_remaining
-- code_upgrade_applied: Only one in the unincluded segment at a time!
+* required\_parent: Fragment would place its corresponding candidate here for children
+* min\_relay\_parent\_number: Monotonically increasing rule, max\_ancestry\_len
+* ump\_messages\_sent mods ump\_remaining
+* code\_upgrade\_applied: Only one in the unincluded segment at a time!
 
----
+***
 
-<!-- .slide: data-background-color="#4A2439" -->
-
-# Prospective Parachains
+## Prospective Parachains
 
 Storing Products of the Backing Process
 
----
+***
 
-## Prospective Parachains Snapshot
+### Prospective Parachains Snapshot
 
-<img rounded style="width: 1500px" src="../async-backing-shallow/img/Prospective_Parachains_Overview.svg" />
+![](../async-backing-shallow/img/Prospective_Parachains_Overview.svg)
 
 Notes:
 
-- Fragment trees only built for active leaves
-- Fragment trees built per scheduled parachain at each leaf
-- Fragment trees may have 0 or more fragments representing potential parablocks making up possible futures for a parachain's state.
-- Collation generation, passing, and seconding work has already been completed for each fragment.
+* Fragment trees only built for active leaves
+* Fragment trees built per scheduled parachain at each leaf
+* Fragment trees may have 0 or more fragments representing potential parablocks making up possible futures for a parachain's state.
+* Collation generation, passing, and seconding work has already been completed for each fragment.
 
----
+***
 
-## Anatomy of A Fragment Tree
+### Anatomy of A Fragment Tree
 
-<img rounded style="width: 1500px" src="./img/Fragment_Tree_Dissected.svg" />
+![](img/Fragment_Tree_Dissected.svg)
 
 Notes:
 
 In this order
 
-- Scope
-- Root node: corresponds to most recently included candidate
-- Child nodes: Mention required parent rule
-- `FragmentNode` contents
-- `CandidateStorage`
-- `GetBackableCandidate`
+* Scope
+* Root node: corresponds to most recently included candidate
+* Child nodes: Mention required parent rule
+* `FragmentNode` contents
+* `CandidateStorage`
+* `GetBackableCandidate`
 
----
+***
 
-<img rounded style="width: 500px" src="./img/checklist.jpeg" />
+![](img/checklist.jpeg)
 
-## Fragment Tree Inclusion Checklist
+### Fragment Tree Inclusion Checklist
 
 When and where can a candidate be included in a fragment tree?
 
-<pba-flex center>
+* Required parent is in tree
+  * Included as child of required parent, if at all
+* `Fragment::validate_against_constraints()` passes
+* Relay parent in scope
 
-- Required parent is in tree
-  - Included as child of required parent, if at all
-- `Fragment::validate_against_constraints()` passes
-- Relay parent in scope
+***
 
-</pba-flex>
-
----
-
-## Relay Parent Limitations for Fragments
+### Relay Parent Limitations for Fragments
 
 What does it mean for a relay parent to be in scope?
 
@@ -278,18 +250,18 @@ Notes:
 
 In Scope:
 
-- On same fork of the relay chain
-- Within `allowed_ancestry_len`
+* On same fork of the relay chain
+* Within `allowed_ancestry_len`
 
 Out of scope:
 
-- Candidates pending availability have been seen on-chain and need to be accounted for even if they go out of scope.
+* Candidates pending availability have been seen on-chain and need to be accounted for even if they go out of scope.\
   The most likely outcome for candidates pending availability is that they will become available, so we need those blocks to be in the `FragmentTree` to accept their children.
-- Relay parent can't move backwards relative to that of the required parent
+* Relay parent can't move backwards relative to that of the required parent
 
----
+***
 
-## Assembling Base Constraints
+### Assembling Base Constraints
 
 Excerpt from `backing_state()` in `runtime/parachains/src/runtime_api_impl/vstaging.rs`
 
@@ -315,9 +287,9 @@ let constraints = Constraints {
 	};
 ```
 
----
+***
 
-## Applying Constraint Modifications
+### Applying Constraint Modifications
 
 Excerpt from `Constraints::apply_modifications()`
 
@@ -333,9 +305,9 @@ if modifications.dmp_messages_processed > new.dmp_remaining_messages.len() {
 }
 ```
 
----
+***
 
-## Validating Against Constraints
+### Validating Against Constraints
 
 `Excerpt from Fragment::validate_against_constraints()`
 
@@ -348,9 +320,9 @@ if relay_parent.number < constraints.min_relay_parent_number {
 }
 ```
 
----
+***
 
-## AsyncBackingParams
+### AsyncBackingParams
 
 ```rust
 pub struct AsyncBackingParams {
@@ -368,42 +340,38 @@ pub struct AsyncBackingParams {
 }
 ```
 
-</br>
-<pba-flex center>
+\
+
 
 Numbers in use for testing Prospective Parachains:
 
-- `max_candidate_depth` = 4
-- `allowed_ancestry_len` = 3
+* `max_candidate_depth` = 4
+* `allowed_ancestry_len` = 3
 
-</pba-flex>
+***
 
----
+## Supporting Changes
 
-<!-- .slide: data-background-color="#4A2439" -->
+***
 
-# Supporting Changes
+### Statement Distribution Changes
 
----
-
-## Statement Distribution Changes
-
-<img rounded style="width: 1500px" src="./img/Statement_Distribution.svg" />
+![](img/Statement_Distribution.svg)
 
 Notes:
 
 Why do we need the refactor?
 
-Answer: Cap on simultaneous candidates per backing group ~3x higher
+Answer: Cap on simultaneous candidates per backing group \~3x higher
 
 Mention
 
-- Announcement - Acknowledgement
-- Request - Response
+* Announcement - Acknowledgement
+* Request - Response
 
----
+***
 
-## Provisioner Changes
+### Provisioner Changes
 
 Function `request_backable_candidates` from the Provisioner subsystem
 
@@ -476,111 +444,87 @@ async fn request_backable_candidates(
 
 Notes:
 
-- Per core
-  - Discuss core states free, scheduled, occupied
-  - Discuss core freeing criteria
-    - `bitfields_indicate_availability`
-      - next_up_on_available
-    - availability time out
-      - next_up_on_timeout
-  - Explain what required path is
-  - Why is required path left empty?
+* Per core
+  * Discuss core states free, scheduled, occupied
+  * Discuss core freeing criteria
+    * `bitfields_indicate_availability`
+      * next\_up\_on\_available
+    * availability time out
+      * next\_up\_on\_timeout
+  * Explain what required path is
+  * Why is required path left empty?
 
----
+***
 
-<img rounded style="width: 500px" src="./img/cumulus.png" />
+![](img/cumulus.png)
 
-## Cumulus Changes
+### Cumulus Changes
 
-<pba-flex center>
+* Consensus driven block authoring
+* Parachain consensus refactor
+  * Aura rewrite
+  * Custom sequencing consensus:
+    * Tendermint
+    * Hotshot consensus
 
-- Consensus driven block authoring
-- Parachain consensus refactor
-  - Aura rewrite
-  - Custom sequencing consensus:
-    - Tendermint
-    - Hotshot consensus
+***
 
-</pba-flex>
+## Async Backing Advantages, Current and Future
 
----
+***
 
-<!-- .slide: data-background-color="#4A2439" -->
-
-# Async Backing Advantages, Current and Future
-
----
-
-## Advantages of Asynchronous Backing
-
-<pba-flex center>
+### Advantages of Asynchronous Backing
 
 1. 3-5x more extrinsics per block
-1. Shorter parachain block times 6s vs 12s
-1. Resulting 6-10x boost in quantity of blockspace
-1. Fewer wasted parachain blocks
-
-</pba-flex>
+2. Shorter parachain block times 6s vs 12s
+3. Resulting 6-10x boost in quantity of blockspace
+4. Fewer wasted parachain blocks
 
 Notes:
 
 1. Collators have more time to fill each block
-1. Advance work ensures backable candidates for each parachain are present to be backed on the relay chain every 6 seconds
-1. Self explanatory
-1. Allow parachain blocks to be ‘reused’ when they don’t make it onto the relay chain in the first attempt
+2. Advance work ensures backable candidates for each parachain are present to be backed on the relay chain every 6 seconds
+3. Self explanatory
+4. Allow parachain blocks to be ‘reused’ when they don’t make it onto the relay chain in the first attempt
 
----
+***
 
-## Async Backing and Exotic Core Scheduling
+### Async Backing and Exotic Core Scheduling
 
-<pba-flex center>
-
-- What is exotic core scheduling?
-  - Multiple cores per parachain
-  - Overlapping leases of many lengths
-  - Lease + On-demand
-- How does asynchronous backing help?
-
-<pba-flex>
+* What is exotic core scheduling?
+  * Multiple cores per parachain
+  * Overlapping leases of many lengths
+  * Lease + On-demand
+* How does asynchronous backing help?
 
 Notes:
 
-- The unincluded segment is necessary to build 2 or more parablocks in a single relay block
+* The unincluded segment is necessary to build 2 or more parablocks in a single relay block
 
----
+***
 
-<img rounded style="width: 500px" src="./img/stopwatch.png" />
+![](img/stopwatch.png)
 
-## Shorter Block Times?
+### Shorter Block Times?
 
-<pba-flex center>
-
-- Async backing gives us unincluded block queuing
-- What else we need for useful shorter times:
-  - Soft finality
-  - Inclusion dependencies (comes with elastic scaling)
-
-<pba-flex>
+* Async backing gives us unincluded block queuing
+* What else we need for useful shorter times:
+  * Soft finality
+  * Inclusion dependencies (comes with elastic scaling)
 
 Notes:
 
-- Soft finality means that the collators will submit as many new blocks with the same extrinsics as needed to retain the same ordering if a parablock candidate is dropped.
-- Inclusion dependencies: Take two parablocks a and b, where a is built on top of b.
+* Soft finality means that the collators will submit as many new blocks with the same extrinsics as needed to retain the same ordering if a parablock candidate is dropped.
+* Inclusion dependencies: Take two parablocks a and b, where a is built on top of b.\
   Then if a and b are being made available on two different cores during the same block we need to ensure that b waits for inclusion until a is also included.
 
----
+***
 
-## Resources
-
-<pba-col center>
+### Resources
 
 1. [Polkadot Async Backing PR](https://github.com/paritytech/polkadot/pull/5022)
-1. [Implementers Guide: Prospective Parachains](https://github.com/paritytech/polkadot/blob/631b66d5daa642fad7ed0a9712194c5b85b96563/roadmap/implementers-guide/src/node/backing/prospective-parachains.md)
-   <!-- FIXME above guide is deprecated -->
-   </pba-col>
+2. [Implementers Guide: Prospective Parachains](https://github.com/paritytech/polkadot/blob/631b66d5daa642fad7ed0a9712194c5b85b96563/roadmap/implementers-guide/src/node/backing/prospective-parachains.md)
 
----
+***
 
-<!-- .slide: data-background-color="#4A2439" -->
-
-# Questions
+## Questions

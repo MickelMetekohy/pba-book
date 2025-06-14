@@ -1,37 +1,39 @@
 ---
 title: Events and Errors
-description: FRAME Events and Errors for web3 builders.
 duration: 1 hour
+description: FRAME Events and Errors for web3 builders.
 ---
 
 # Events and Errors
 
----
-
 ## Events and Errors
+
+***
+
+### Events and Errors
 
 In this presentation, we will go over two of the tools you have access to when developing FRAME Pallets to express how your runtime calls are executing.
 
----
+***
 
-# Errors
+## Errors
 
----
+***
 
-## Intro to Errors
+### Intro to Errors
 
 Not all extrinsics are valid. It could be for a number of reasons:
 
-- The extrinsic itself is badly formatted. (wrong parameters, encoding, etc...)
-- The state transition function does not allow it.
-  - Maybe a timing problem.
-  - User might be lacking resources.
-  - State transition might be waiting for other data or processes.
-  - etc...
+* The extrinsic itself is badly formatted. (wrong parameters, encoding, etc...)
+* The state transition function does not allow it.
+  * Maybe a timing problem.
+  * User might be lacking resources.
+  * State transition might be waiting for other data or processes.
+  * etc...
 
----
+***
 
-## Dispatch Result
+### Dispatch Result
 
 All pallet calls return at the end a `DispatchResult`.
 
@@ -43,13 +45,13 @@ pub type DispatchResult = Result<(), sp_runtime::DispatchError>;
 
 So a function can either return `Ok(())` or some `DispatchError`.
 
----
+***
 
-## Dispatch Error
+### Dispatch Error
 
 From: `substrate/primitives/runtime/src/lib.rs`
 
-```rust [0|6-10|13-14|15-16]
+```rust
 /// Reason why a dispatch call failed.
 #[derive(Eq, Clone, Copy, Encode, Decode, Debug, TypeInfo, PartialEq, MaxEncodedLen)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -90,9 +92,9 @@ pub enum DispatchError {
 }
 ```
 
----
+***
 
-## Module Errors
+### Module Errors
 
 From: `substrate/primitives/runtime/src/lib.rs`
 
@@ -118,11 +120,11 @@ pub struct ModuleError {
 
 So an error is at most just 5 bytes.
 
----
+***
 
-## Declaring Errors
+### Declaring Errors
 
-```rust [0|23-30|47-48]
+```rust
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub use pallet::*;
@@ -179,9 +181,9 @@ pub mod pallet {
 }
 ```
 
----
+***
 
-## Using Errors
+### Using Errors
 
 When writing tests, you can use errors to make sure that your functions execute exactly as expected.
 
@@ -197,9 +199,9 @@ fn errors_example() {
 }
 ```
 
----
+***
 
-## Encoding Errors
+### Encoding Errors
 
 All errors ultimately become a `DispatchError`, which is the final type returned by the runtime.
 
@@ -219,33 +221,15 @@ println!("{:?}", dispatch_error2.encode());
 [3, 1, 1, 0, 0, 0]
 ```
 
----
+***
 
-## Dispatch Error Encoding
+### Dispatch Error Encoding
 
-<table>
-<tr>
-	<td>3</td>
-	<td>1</td>
-	<td>1</td>
-	<td>0</td>
-	<td>0</td>
-	<td>0</td>
-</tr>
-<tr>
-	<td>DispatchError::Module</td>
-	<td>Pallet #2</td>
-	<td>Error #2</td>
-	<td>(unused)</td>
-	<td>(unused)</td>
-	<td>(unused)</td>
-</tr>
-</table>
+| 3                     | 1         | 1        | 0        | 0        | 0        |
+| --------------------- | --------- | -------- | -------- | -------- | -------- |
+| DispatchError::Module | Pallet #2 | Error #2 | (unused) | (unused) | (unused) |
 
 Encoding based on configuration:
-
-<div class="flex-container">
-<div class="left" style="max-width: 700px;">
 
 ```rust
 // Configure a mock runtime to test the pallet.
@@ -256,9 +240,6 @@ frame_support::construct_runtime!(
 	}
 );
 ```
-
-</div>
-<div class="right" style="margin-left: 10px; max-width: 700px;">
 
 ```rust
 // Errors inform users that something went wrong.
@@ -271,11 +252,9 @@ pub enum Error<T> {
 }
 ```
 
-</div>
-</div>
----
+\---
 
-## Nested Errors
+### Nested Errors
 
 Errors support up to 5 bytes, which allows you to create nested errors, or insert other minimal data with the `PalletError` derive macro.
 
@@ -307,15 +286,15 @@ pub enum Error<T> {
 
 Notes:
 
-<https://github.com/paritytech/substrate/pull/10242>
+[https://github.com/paritytech/substrate/pull/10242](https://github.com/paritytech/substrate/pull/10242)
 
----
+***
 
-# Events
+## Events
 
----
+***
 
-## Intro to Events
+### Intro to Events
 
 When an extrinsic completes successfully, there is often some metadata you would like to expose to the outside world about what exactly happened during the execution.
 
@@ -323,11 +302,11 @@ For example, there may be multiple different ways an extrinsic completes success
 
 Or maybe there is some significant state transition that you know users
 
----
+***
 
-## Declaring and Emitting Events
+### Declaring and Emitting Events
 
-```rust [10-15|32-37|50]
+```rust
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub use pallet::*;
@@ -384,9 +363,9 @@ pub mod pallet {
 }
 ```
 
----
+***
 
-## Deposit Event
+### Deposit Event
 
 ```rust
 #[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -405,13 +384,14 @@ impl<T: Config> Pallet<T> {
 }
 ```
 
-<br />
+\
+
 
 `frame/support/procedural/src/pallet/expand/event.rs`
 
----
+***
 
-## Deposit Event in System
+### Deposit Event in System
 
 Events are just a storage item in FRAME System.
 
@@ -435,15 +415,15 @@ pub(super) type Events<T: Config> =
 pub(super) type EventCount<T: Config> = StorageValue<_, EventIndex, ValueQuery>;
 ```
 
----
+***
 
-## Deposit Events in System
+### Deposit Events in System
 
 Depositing events ultimately just appends a new event to this storage.
 
 `frame/system/src/lib.rs`
 
-```rust [0|1-4|34|13-16]
+```rust
 /// Deposits an event into this block's event record.
 pub fn deposit_event(event: impl Into<T::RuntimeEvent>) {
 	Self::deposit_event_indexed(&[], event.into());
@@ -485,18 +465,18 @@ pub fn deposit_event_indexed(topics: &[T::Hash], event: T::RuntimeEvent) {
 }
 ```
 
----
+***
 
-## You Cannot Read Events
+### You Cannot Read Events
 
-- The events storage are an unbounded vector of individual events emitted by your pallets.
-- If you ever read this storage, you will introduce the whole thing into your storage proof!
-- Never write runtime logic which reads from or depends on events.
-- Tests are okay.
+* The events storage are an unbounded vector of individual events emitted by your pallets.
+* If you ever read this storage, you will introduce the whole thing into your storage proof!
+* Never write runtime logic which reads from or depends on events.
+* Tests are okay.
 
----
+***
 
-## You Cannot Read Events
+### You Cannot Read Events
 
 `frame/system/src/lib.rs`
 
@@ -529,9 +509,9 @@ pub fn events() -> Vec<EventRecord<T::RuntimeEvent, T::Hash>> {
 }
 ```
 
----
+***
 
-## Testing Events
+### Testing Events
 
 Remember to set the block number to greater than zero!
 
@@ -560,9 +540,9 @@ pub fn assert_last_event(event: T::RuntimeEvent) {
 }
 ```
 
----
+***
 
-## Using Events in Tests
+### Using Events in Tests
 
 ```rust
 #[test]
@@ -584,11 +564,11 @@ fn events_example() {
 
 Remember other pallets can deposit events too!
 
----
+***
 
-## Summary
+### Summary
 
-- Events and Errors are two ways you can signal to users what is happening when they dispatch an extrinsic.
-- Events usually signify some successful thing happening.
-- Errors signify when something has gone bad (and all changes reverted).
-- Both are accessible by the end user when they occur.
+* Events and Errors are two ways you can signal to users what is happening when they dispatch an extrinsic.
+* Events usually signify some successful thing happening.
+* Errors signify when something has gone bad (and all changes reverted).
+* Both are accessible by the end user when they occur.

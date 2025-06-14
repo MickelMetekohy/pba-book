@@ -5,33 +5,35 @@ description: Substrate and FRAME Tips and Tricks for web3 builders
 
 # Substrate and FRAME Tips and Tricks
 
-Notes:
-
-- A random collection of things that you should probably know about.
-- These are relevant for coding in FRAME and Substrate.
-
----
-
-# Part 1 Substrate Stuff
-
----
-
-## `<Type as Trait>::AssociatedType`
-
-- The single most useful Rust syntactic detail that you _MUST_ know.
+## Substrate and FRAME Tips and Tricks
 
 Notes:
 
-what is a type? A struct is a type. An unum is a type. all primitives are type. A lot of things are
-types.
+* A random collection of things that you should probably know about.
+* These are relevant for coding in FRAME and Substrate.
 
----v
+***
+
+## Part 1 Substrate Stuff
+
+***
 
 ### `<Type as Trait>::AssociatedType`
 
+* The single most useful Rust syntactic detail that you _MUST_ know.
+
+Notes:
+
+what is a type? A struct is a type. An unum is a type. all primitives are type. A lot of things are\
+types.
+
+\---v
+
+#### `<Type as Trait>::AssociatedType`
+
 Example:
 
-```rust [1-4|1-8|1-12|14|1-100]
+```rust
 trait Config {
   type Extrinsic
   type Header: HeaderT
@@ -50,14 +52,14 @@ pub type NumberFor<C> = <<C as Config>::Header as HeaderT>::Number;
 
 Notes:
 
-turbo fish
+turbo fish\
 fully qualified syntax.
 
----v
+\---v
 
-### Speaking of Traits..
+#### Speaking of Traits..
 
-- What is the difference between generics and associated types?
+* What is the difference between generics and associated types?
 
 ```rust
 trait Block<Extrinsic> {
@@ -128,9 +130,9 @@ fn main() {
 }
 ```
 
----v
+\---v
 
-### Speaking of Traits..
+#### Speaking of Traits..
 
 Both generics and associated types can be specified, but the syntax is a bit different.
 
@@ -142,32 +144,30 @@ trait Block<Extrinsic> {
 fn process_block<B: Block<E1, Header = H1>>(b: B)
 ```
 
----v
+\---v
 
-### Speaking of Traits..
+#### Speaking of Traits..
 
-- Anything that can be expressed with associated types can also be expressed with generics.
-- Associated Types << Generics
-- Associated types usually lead to less boilerplate.
+* Anything that can be expressed with associated types can also be expressed with generics.
+* Associated Types << Generics
+* Associated types usually lead to less boilerplate.
 
----
+***
 
-## The `std` Paradigm
+### The `std` Paradigm
 
-- Recap:
+* Recap:
+  * `std` is the interface to the common OS-abstractions.
+  * `core` is a subset of `std` that makes no assumption about the operating system.
+* a `no_std` crate is one that relies on `core` rather than `std`.
 
-  - `std` is the interface to the common OS-abstractions.
-  - `core` is a subset of `std` that makes no assumption about the operating system.
+\---v
 
-- a `no_std` crate is one that relies on `core` rather than `std`.
+#### Cargo Features
 
----v
-
-### Cargo Features
-
-- Way to compile different code via flags.
-- Crates define some features in their `Cargo.toml`
-- Crates can conditionally enable features of their dependencies as well.
+* Way to compile different code via flags.
+* Crates define some features in their `Cargo.toml`
+* Crates can conditionally enable features of their dependencies as well.
 
 ```toml
 [dependencies]
@@ -180,12 +180,12 @@ additional-features = ["other-stuff/on-steroids"]
 
 Notes:
 
-imagine that you have a crate that has some additional features that are not always needed. You put
+imagine that you have a crate that has some additional features that are not always needed. You put\
 that behind a feature flag called `additional-features`.
 
----v
+\---v
 
-### Cargo Features: Substrate Wasm Crates
+#### Cargo Features: Substrate Wasm Crates
 
 ```toml
 [dependencies]
@@ -202,43 +202,43 @@ std = [
 
 Notes:
 
-every crate will have a feature "std". This is a flag that you are compiling with the standard
+every crate will have a feature "std". This is a flag that you are compiling with the standard\
 library. This is the default.
 
-Then, bringing a dependency with `default-features = false` means by default, don't enable this
+Then, bringing a dependency with `default-features = false` means by default, don't enable this\
 dependencies "std".
 
-Then, in `std = ["dep/std"]` you are saying "if my std is enabled, enable my dependencies std as
+Then, in `std = ["dep/std"]` you are saying "if my std is enabled, enable my dependencies std as\
 well".
 
----v
+\---v
 
-### Cargo Features
+#### Cargo Features
 
-- The name "`std`" is just an idiom in the rust ecosystem.
-- `no_std` does NOT mean Wasm!
-- `std` does not mean native!
+* The name "`std`" is just an idiom in the rust ecosystem.
+* `no_std` does NOT mean Wasm!
+* `std` does not mean native!
 
 Notes:
 
 But in substrate, it kinda means like that:
 
-std => native
-no_std => wasm
+std => native\
+no\_std => wasm
 
----v
+\---v
 
-### The `std` Paradigm
+#### The `std` Paradigm
 
-- All crates in substrate that eventually compile to Wasm:
+* All crates in substrate that eventually compile to Wasm:
 
 ```rust
 #![cfg_attr(not(feature = "std"), no_std)]
 ```
 
----v
+\---v
 
-### The `std` Paradigm: Adding dependencies
+#### The `std` Paradigm: Adding dependencies
 
 ```sh
 error: duplicate lang item in crate sp_io (which frame_support depends on): panic_impl.
@@ -256,12 +256,11 @@ error: duplicate lang item in crate sp_io (which frame_support depends on): oom.
  the lang item is first defined in crate std (which serde depends on)
 ```
 
----v
+\---v
 
-### The `std` Paradigm
+#### The `std` Paradigm
 
-A subset of the standard types in rust that also exist in rust `core` are re-exported from
-[`sp_std`](https://paritytech.github.io/substrate/master/sp_std/index.html).
+A subset of the standard types in rust that also exist in rust `core` are re-exported from[`sp_std`](https://paritytech.github.io/substrate/master/sp_std/index.html).
 
 ```rust
 sp_std::prelude::*;
@@ -269,42 +268,32 @@ sp_std::prelude::*;
 
 Notes:
 
-Hashmap not exported due to non-deterministic concerns.
+Hashmap not exported due to non-deterministic concerns.\
 floats are usable, but also non-deterministic! (and I think they lack `encode`, `decode` impl)
 
 interesting to look at `if_std` macro in `sp_std`.
 
----
+***
 
-## Logging And Prints In The Runtime.
+### Logging And Prints In The Runtime.
 
-- First, why bother? let's just add as many logs as we want into the runtime.
-
-<!-- .element: class="fragment" -->
-
-- Size of the wasm blob matters..
-
-<!-- .element: class="fragment" -->
-
-- Any logging increases the size of the Wasm blob. **String literals** are stored somewhere in your
+* First, why bother? let's just add as many logs as we want into the runtime.
+* Size of the wasm blob matters..
+* Any logging increases the size of the Wasm blob. **String literals** are stored somewhere in your\
   program!
 
-<!-- .element: class="fragment" -->
+\---v
 
----v
+#### Logging And Prints In The Runtime.
 
-### Logging And Prints In The Runtime.
-
-- `wasm2wat polkadot_runtime.wasm > dump | rg stripped`
-
-- Should get you the `.rodata` (read-only data) line of the wasm blob, which contains all the logging
+* `wasm2wat polkadot_runtime.wasm > dump | rg stripped`
+* Should get you the `.rodata` (read-only data) line of the wasm blob, which contains all the logging\
   noise.
+* This contains string literals form errors, logs, metadata, etc.
 
-- This contains string literals form errors, logs, metadata, etc.
+\---v
 
----v
-
-### Logging And Prints In The Runtime.
+#### Logging And Prints In The Runtime.
 
 ```rust
 #[derive(sp_std::fmt::Debug)]
@@ -320,19 +309,19 @@ struct LONG_AND_BEAUTIFUL_NAME {
 
 will add a lot of string literals to your wasm blob.
 
----v
+\---v
 
-### Logging And Prints In The Runtime.
+#### Logging And Prints In The Runtime.
 
 `sp_std::fmt::Debug` vs `sp_debug_derive::RuntimeDebug`
 
 Notes:
 
-<https://paritytech.github.io/substrate/master/sp_debug_derive/index.html>
+[https://paritytech.github.io/substrate/master/sp\_debug\_derive/index.html](https://paritytech.github.io/substrate/master/sp_debug_derive/index.html)
 
----v
+\---v
 
-### Logging And Prints In The Runtime.
+#### Logging And Prints In The Runtime.
 
 ```rust
 #[derive(RuntimeDebug)]
@@ -356,13 +345,13 @@ impl ::core::fmt::Debug for WithDebug {
 }
 ```
 
----v
+\---v
 
-### Logging And Prints In The Runtime.
+#### Logging And Prints In The Runtime.
 
 Once types implement `Debug` or `RuntimeDebug`, they can be printed. Various ways:
 
-- If you only want something in tests, native builds etc
+* If you only want something in tests, native builds etc
 
 ```rust
 sp_std::if_std! {
@@ -371,35 +360,35 @@ sp_std::if_std! {
 }
 ```
 
----v
+\---v
 
-### Logging And Prints In The Runtime.
+#### Logging And Prints In The Runtime.
 
-- Or you can use the common `log` crate
+* Or you can use the common `log` crate
 
 ```rust
 log::info!(target: "foo", "hello world!");
 log::debug!(target: "bar", "hello world! ({})", 10u32);
 ```
 
----v
+\---v
 
-### Logging And Prints In The Runtime.
+#### Logging And Prints In The Runtime.
 
-- But `log` crate doesn't do much in itself! it needs two additional steps to work:
+* But `log` crate doesn't do much in itself! it needs two additional steps to work:
 
 1. `// $ RUST_LOG=foo=debug,bar=trace cargo run`
 2. `sp_tracing::try_init_simple()`
 
 Notes:
 
-<https://paritytech.github.io/substrate/master/sp_tracing/index.html>
+[https://paritytech.github.io/substrate/master/sp\_tracing/index.html](https://paritytech.github.io/substrate/master/sp_tracing/index.html)
 
----v
+\---v
 
-### Logging And Prints In The Runtime.
+#### Logging And Prints In The Runtime.
 
-- Log statements are only evaluated if the corresponding level and target is met.
+* Log statements are only evaluated if the corresponding level and target is met.
 
 ```rust
 /// only executed if `RUST_LOG=KIAN=trace`
@@ -408,25 +397,24 @@ frame_support::log::trace!(target: "KIAN", "({:?})", (0..100000).into_iter().col
 
 Notes:
 
-`log` in rust does not do anything -- it only tracks what needs to be logged. Then you need a logger
+`log` in rust does not do anything -- it only tracks what needs to be logged. Then you need a logger\
 to actually export them. In rust this is often `env_logger` or `sp_tracing` in substrate tests.
 
 In the runtime, the log messages are sent via the host functions to the client to be printed.
 
 If the interface is built with `disable-logging`, it omits all log messages.
 
----
+***
 
-## Arithmetic Helpers, and the `f32`, `f64` Story.
+### Arithmetic Helpers, and the `f32`, `f64` Story.
 
-- Floating point numbers have different standards, and (**_slightly_**) different implementations on
+* Floating point numbers have different standards, and (_**slightly**_) different implementations on\
   different architectures and vendors.
+* If my balance is `10.000000000000001` DOT on one validator and `10.000000000000000` DOT on another validator, game over for your consensus 😮‍💨.
 
-- If my balance is `10.000000000000001` DOT on one validator and `10.000000000000000` DOT on another validator, game over for your consensus 😮‍💨.
+\---v
 
----v
-
-### PerThing.
+#### PerThing.
 
 ```python
 > .2 + .2 + .2 == .6
@@ -441,13 +429,13 @@ If the interface is built with `disable-logging`, it omits all log messages.
 > false
 ```
 
-- Search "weird float behavior" for more entertainment around this.
+* Search "weird float behavior" for more entertainment around this.
 
----v
+\---v
 
-### PerThing.
+#### PerThing.
 
-- We store ratios and such in the runtime with "Fixed-Point" arithmetic types.
+* We store ratios and such in the runtime with "Fixed-Point" arithmetic types.
 
 ```rust
 struct Percent(u8);
@@ -463,9 +451,9 @@ impl Mul<u32> for Percent {
 }
 ```
 
----v
+\---v
 
-### PerThing.
+#### PerThing.
 
 ```rust
 use sp_arithmetic::Perbill;
@@ -478,11 +466,11 @@ let p = Perbill::from_rational(1, 4);
 > 25u32;
 ```
 
-- Some precision concerns exist, but that's a story for another day.
+* Some precision concerns exist, but that's a story for another day.
 
----v
+\---v
 
-### Fixed Point Numbers
+#### Fixed Point Numbers
 
 `Per-thing` is great for representing `[0, 1]` range.
 
@@ -495,9 +483,9 @@ What if we need more?
 350 ~ 3.5
 ```
 
----v
+\---v
 
-### Fixed Point Numbers
+#### Fixed Point Numbers
 
 ```rust
 use sp_arithmetic::FixedU64;
@@ -508,13 +496,13 @@ let z = x * y;
 > 25
 ```
 
----v
+\---v
 
-### Larger Types
+#### Larger Types
 
-- [`U256`](https://paritytech.github.io/substrate/master/sp_core/struct.U256.html), `U512`: battle-tested since the ethereum days.
-- [substrate-fixed](https://github.com/encointer/substrate-fixed): community project. Supercharged `PerThing` and `Fixed`.
-- [`big_uint.rs`](https://paritytech.github.io/substrate/master/sp_arithmetic/biguint/index.html) (unaudited)
+* [`U256`](https://paritytech.github.io/substrate/master/sp_core/struct.U256.html), `U512`: battle-tested since the ethereum days.
+* [substrate-fixed](https://github.com/encointer/substrate-fixed): community project. Supercharged `PerThing` and `Fixed`.
+* [`big_uint.rs`](https://paritytech.github.io/substrate/master/sp_arithmetic/biguint/index.html) (unaudited)
 
 ```rust
 pub struct BigUint {
@@ -523,69 +511,54 @@ pub struct BigUint {
 }
 ```
 
----v
+\---v
 
-### Arithmetic Types
+#### Arithmetic Types
 
-- See [`sp-arithmetic`](https://paritytech.github.io/substrate/master/sp_arithmetic/index.html) to
+* See [`sp-arithmetic`](https://paritytech.github.io/substrate/master/sp_arithmetic/index.html) to\
   learn more.
 
----
+***
 
-### Fallibility: Math Operations
+#### Fallibility: Math Operations
 
 Things like **addition**, **multiplication**, **division** could all easily fail.
 
-<div>
+* Panic
+  * `u32::MAX * 2 / 2` (in debug builds)
+  * `100 / 0`
+* Overflow
+  * `u32::MAX * 2 / 2` (in release builds)
 
-- Panic
-  - `u32::MAX * 2 / 2` (in debug builds)
-  - `100 / 0`
+\---v
 
-</div>
+#### Fallibility: Math Operations
 
-<!-- .element: class="fragment" -->
+*   `Checked` -- prevention ✋🏻
 
-<div>
+    ```
+    if let Some(outcome) = a.checked_mul(b) { ... } else { ... }
+    ```
+*   `Saturating` -- silent recovery 🤫
 
-- Overflow
-  - `u32::MAX * 2 / 2` (in release builds)
-
-</div>
-
-<!-- .element: class="fragment" -->
-
----v
-
-### Fallibility: Math Operations
-
-- `Checked` -- prevention ✋🏻
-
-  ```
-  if let Some(outcome) = a.checked_mul(b) { ... } else { ... }
-  ```
-
-- `Saturating` -- silent recovery 🤫
-
-  ```
-  let certain_output = a.saturating_mul(b);
-  ```
+    ```
+    let certain_output = a.saturating_mul(b);
+    ```
 
 Notes:
 
-Why would you ever want to saturate? only in cases where you know if the number is overflowing,
-other aspects of the system is so fundamentally screwed that there is no point in doing any kind of
+Why would you ever want to saturate? only in cases where you know if the number is overflowing,\
+other aspects of the system is so fundamentally screwed that there is no point in doing any kind of\
 recovery.
 
-There's also `wrapping_op` and `carrying_op` etc on all rust primitives, but not quite
+There's also `wrapping_op` and `carrying_op` etc on all rust primitives, but not quite\
 relevant.
 
-<https://doc.rust-lang.org/std/primitive.u32.html#method.checked_add>
-<https://doc.rust-lang.org/std/primitive.u32.html#method.saturating_add>
+[https://doc.rust-lang.org/std/primitive.u32.html#method.checked\_add](https://doc.rust-lang.org/std/primitive.u32.html#method.checked_add)[https://doc.rust-lang.org/std/primitive.u32.html#method.saturating\_add](https://doc.rust-lang.org/std/primitive.u32.html#method.saturating_add)
 
----v
+\---v
 
-### Fallibility: Conversion
+#### Fallibility: Conversion
 
 ```rust
 fn main() {
@@ -598,12 +571,12 @@ Notes:
 
 conversion of primitive number types is also a common point of error. Avoid `as`.
 
----v
+\---v
 
-### Fallibility: Conversion
+#### Fallibility: Conversion
 
-- Luckily, rust is already pretty strict for the primitive types.
-- `TryInto` / `TryFrom` / `From` / `Into`
+* Luckily, rust is already pretty strict for the primitive types.
+* `TryInto` / `TryFrom` / `From` / `Into`
 
 ```rust
 impl From<u16> for u32 {
@@ -613,8 +586,6 @@ impl From<u16> for u32 {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
 ```rust
 impl TryFrom<u32> for u16 {
   fn try_from(x: u32) -> Result<u16, _> {
@@ -623,43 +594,34 @@ impl TryFrom<u32> for u16 {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
 Notes:
 
-Typically you don't implement `Into` and `TryInto`, because of blanket impls. See:
-<https://doc.rust-lang.org/std/convert/trait.From.html>
+Typically you don't implement `Into` and `TryInto`, because of blanket impls. See:[https://doc.rust-lang.org/std/convert/trait.From.html](https://doc.rust-lang.org/std/convert/trait.From.html)
 
 For any T and U, `impl From<T> for U` implies `impl Into<U> for T`
 
----v
+\---v
 
-### Fallibility: Conversion
+#### Fallibility: Conversion
 
-- `struct Foo<T: From<u32>>`
+* `struct Foo<T: From<u32>>`
 
 T is u32 or larger.
 
-<!-- .element: class="fragment" -->
-
-- `struct Foo<T: Into<u32>>`
+* `struct Foo<T: Into<u32>>`
 
 `T` is u32 or smaller.
 
-<!-- .element: class="fragment" -->
-
-- `struct Foo<T: TryInto<u32>>`
+* `struct Foo<T: TryInto<u32>>`
 
 `T` can be any of numeric types.
 
-<!-- .element: class="fragment" -->
+\---v
 
----v
+#### Fallibility: Conversion
 
-### Fallibility: Conversion
-
-- Substrate also provides a trait for infallible saturated conversion as well.
-- See `sp-arithmetic` for more handy stuff.
+* Substrate also provides a trait for infallible saturated conversion as well.
+* See `sp-arithmetic` for more handy stuff.
 
 ```rust
 trait SaturatedConversion {
@@ -671,15 +633,15 @@ assert_eq!(u128::MAX.saturating_into::<u32>(), u32::MAX);
 
 Notes:
 
-<https://paritytech.github.io/substrate/master/sp_arithmetic/traits/trait.SaturatedConversion.html>
+[https://paritytech.github.io/substrate/master/sp\_arithmetic/traits/trait.SaturatedConversion.html](https://paritytech.github.io/substrate/master/sp_arithmetic/traits/trait.SaturatedConversion.html)
 
----
+***
 
-# Part 2: FRAME Stuff
+## Part 2: FRAME Stuff
 
----
+***
 
-## `trait Get`
+### `trait Get`
 
 A very basic, yet very substrate-idiomatic way to pass _values_ through _types_.
 
@@ -698,22 +660,18 @@ impl<T: Default> Get<T> for () {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
 ```rust
 struct Foo<G: Get<u32>>;
 let foo = Foo<()>;
 ```
 
-<!-- .element: class="fragment" -->
-
 Notes:
 
 implementing defaults for `()` is a very FRAME-idiomatic way of doing things.
 
----v
+\---v
 
-### `trait Get`
+#### `trait Get`
 
 ```rust
 parameter_types! {
@@ -731,17 +689,15 @@ impl Get<u32> for Foo {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
 Notes:
 
 You have implemented this as a part of your rust exam.
 
----
+***
 
-## `bounded`
+### `bounded`
 
-- `BoundedVec`, `BoundedSlice`, `BoundedBTreeMap`, `BoundedSlice`
+* `BoundedVec`, `BoundedSlice`, `BoundedBTreeMap`, `BoundedSlice`
 
 ```rust
 #[derive(Encode, Decode)]
@@ -751,13 +707,13 @@ pub struct BoundedVec<T, S: Get<u32>>(
 );
 ```
 
-- &shy;<!-- .element: class="fragment" --> `PhantomData`?
+* ­ `PhantomData`?
 
----v
+\---v
 
-### `bounded`
+#### `bounded`
 
-- Why not do a bounded type like this? 🤔
+* Why not do a bounded type like this? 🤔
 
 ```rust
 #[cfg_attr(feature = "std", derive(Serialize))]
@@ -768,16 +724,16 @@ pub struct BoundedVec<T>(
 );
 ```
 
----v
+\---v
 
-### `bounded`
+#### `bounded`
 
-_`Get` trait is a way to convey values through types. The type system is mostly for compiler, and
-has minimal overhead at runtime._
+_`Get` trait is a way to convey values through types. The type system is mostly for compiler, and_\
+_has minimal overhead at runtime._
 
----
+***
 
-## `trait Convert`
+### `trait Convert`
 
 ```rust
 pub trait Convert<A, B> {
@@ -795,15 +751,13 @@ impl<T> Convert<T, T> for Identity {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
 Notes:
 
 this one's much simpler, but good excuse to teach them blanket implementations.
 
----v
+\---v
 
-### Example of `Get` and `Convert`
+#### Example of `Get` and `Convert`
 
 ```rust
 /// Some configuration for my module.
@@ -824,27 +778,21 @@ impl Config for Runtime {
 }
 ```
 
-<!-- .element: class="fragment" -->
-
 ```rust
 Runtime as Config>::Convertor::convert(_, _);
 ```
-
-<!-- .element: class="fragment" -->
 
 ```rust
 fn generic_fn<T: Config>() { <T as Config>::Convertor::convert(_, _)}
 ```
 
-<!-- .element: class="fragment" -->
-
 Notes:
 
-often times, in examples above, you have to use this syntax: <https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name>
+often times, in examples above, you have to use this syntax: [https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name](https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name)
 
----
+***
 
-## Implementing Traits For Tuples
+### Implementing Traits For Tuples
 
 ```rust
 struct Module1;
@@ -885,22 +833,21 @@ fn main() {
 }
 ```
 
----v
+\---v
 
-### Implementing Traits For Tuples
+#### Implementing Traits For Tuples
 
 1. `on_initialize`, in its ideal form, does not have `&self`, it is defined on the **type**, not a **value**.
-
-1. **Tuples** are the natural way to group **types** together (analogous to have a **vector** is the natural way to group **values** together..)
+2. **Tuples** are the natural way to group **types** together (analogous to have a **vector** is the natural way to group **values** together..)
 
 ```rust
 // fully-qualified syntax - turbo-fish.
 <(Module1, Module2, Module3) as OnInitialize>::on_initialize();
 ```
 
----v
+\---v
 
-### Implementing Traits For Tuples
+#### Implementing Traits For Tuples
 
 Only problem: A lot of boilerplate. Macros!
 
@@ -924,9 +871,9 @@ impl_for_tuples!(A, B, C, D, E);
 impl_for_tuples!(A, B, C, D, E, F);
 ```
 
----v
+\---v
 
-### Implementing Traits For Tuples
+#### Implementing Traits For Tuples
 
 And then someone made `impl_for_tuples` crate.
 
@@ -940,36 +887,37 @@ pub trait OnTimestampSet<Moment> {
 
 Notes:
 
-<https://docs.rs/impl-trait-for-tuples/latest/impl_trait_for_tuples/>
+[https://docs.rs/impl-trait-for-tuples/latest/impl\_trait\_for\_tuples/](https://docs.rs/impl-trait-for-tuples/latest/impl_trait_for_tuples/)
 
----
+***
 
-## Defensive Programming
+### Defensive Programming
 
-> ..is a form of defensive design to ensure the continuing function of a piece of software under
+> ..is a form of defensive design to ensure the continuing function of a piece of software under\
 > unforeseen circumstances... where **high availability**, **safety**, or **security** is needed.
 
-- As you know, you should (almost) never panic in your runtime code.
+* As you know, you should (almost) never panic in your runtime code.
 
----v
+\---v
 
-### Defensive Programming
+#### Defensive Programming
 
-- First reminder: don't panic, unless if you want to punish someone!
-- `.unwrap()`? no no
+* First reminder: don't panic, unless if you want to punish someone!
+* `.unwrap()`? no no
 
-<br />
+\
 
-- be careful with implicit unwraps in standard operations!
-  - slice/vector indexing can panic if out of bound
-  - `.insert`, `.remove`
-  - division by zero.
 
----v
+* be careful with implicit unwraps in standard operations!
+  * slice/vector indexing can panic if out of bound
+  * `.insert`, `.remove`
+  * division by zero.
 
-### Defensive Programming
+\---v
 
-- When using operations that could panic, comment exactly above it why you are sure it won't panic.
+#### Defensive Programming
+
+* When using operations that could panic, comment exactly above it why you are sure it won't panic.
 
 ```rust
 let pos = announcements
@@ -980,9 +928,9 @@ let pos = announcements
 announcements.remove(pos);
 ```
 
----v
+\---v
 
-### Defensive Programming: QED
+#### Defensive Programming: QED
 
 Or when using options or results that need to be unwrapped but are known to be `Ok(_)`, `Some(_)`:
 
@@ -995,11 +943,11 @@ if maybe_value.is_none() {
 let value = maybe_value.expect("value checked to be 'Some'; qed");
 ```
 
-- Q.E.D. or QED is an initialism of the Latin phrase "quod erat demonstrandum", meaning "**which was to be demonstrated**".
+* Q.E.D. or QED is an initialism of the Latin phrase "quod erat demonstrandum", meaning "**which was to be demonstrated**".
 
----v
+\---v
 
-### Defensive Programming
+#### Defensive Programming
 
 When writing APIs that could panic, explicitly document them, just like the core rust documentation.
 
@@ -1020,11 +968,11 @@ pub fn try_insert(&mut self, index: usize, element: T) -> Result<(), ()> {
 }
 ```
 
----v
+\---v
 
-### Defensive Programming
+#### Defensive Programming
 
-- Speaking of documentation, [here's a very good guideline](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html)!
+* Speaking of documentation, [here's a very good guideline](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html)!
 
 ````rust
 /// Multiplies the given input by two.
@@ -1044,11 +992,11 @@ pub fn try_insert(&mut self, index: usize, element: T) -> Result<(), ()> {
 fn multiply_by_2(x: u32) -> u32 { .. }
 ````
 
----v
+\---v
 
-### Defensive Programming
+#### Defensive Programming
 
-- Try and not be this guy:
+* Try and not be this guy:
 
 ```rust
 /// This function works with module x and multiples the given input by two. If
@@ -1058,11 +1006,11 @@ fn multiply_by_2(x: u32) -> u32 { .. }
 fn multiply_by_2(x: u32) -> u32 { .. }
 ```
 
----v
+\---v
 
-### Defensive Programming
+#### Defensive Programming
 
-- The overall ethos of defensive programming is along the lines of:
+* The overall ethos of defensive programming is along the lines of:
 
 ```rust
 // we have good reasons to believe this is `Some`.
@@ -1082,9 +1030,9 @@ Notes:
 
 But, for example, you are absolutely sure that `Error::DefensiveError` will never happen, can we enforce it better?
 
----v
+\---v
 
-### Defensive Programming
+#### Defensive Programming
 
 ```rust
 let x = y
@@ -1097,11 +1045,11 @@ let x = y
   })?;
 ```
 
----v
+\---v
 
-### Defensive Programming
+#### Defensive Programming
 
-- Yes: [Defensive traits](https://paritytech.github.io/substrate/master/frame_support/traits/trait.Defensive.html):
+* Yes: [Defensive traits](https://paritytech.github.io/substrate/master/frame_support/traits/trait.Defensive.html):
 
 ```
 // either return a reasonable default..
@@ -1114,13 +1062,13 @@ let x = y.defensive_ok_or(Error::DefensiveError)?;
 It adds some boilerplate to:
 
 1. Panic when `debug_assertions` are enabled (tests).
-1. append a `log::error!`.
+2. append a `log::error!`.
 
----
+***
 
-## Additional Resources! 😋
+### Additional Resources! 😋
 
-<img width="300px" rounded src="../scale/img/thats_all_folks.png" />
+![](../scale/img/thats_all_folks.png)
 
 > Check speaker notes (click "s" 😉)
 
@@ -1128,33 +1076,30 @@ It adds some boilerplate to:
 
 Notes:
 
-- Rust didn't have u128 until not too long ago! <https://github.com/paritytech/substrate/pull/163/files>
-- `TryFrom`/`TryInto` are also not too old! <https://github.com/paritytech/substrate/pull/163/files#r188938077>
-- Remove `As`, which tried to fill the lack of `TryFrom/TryInto` <https://github.com/paritytech/substrate/pull/2602>
-- Runtime Logging PR: <https://github.com/paritytech/substrate/pull/3821>
+* Rust didn't have u128 until not too long ago! [https://github.com/paritytech/substrate/pull/163/files](https://github.com/paritytech/substrate/pull/163/files)
+* `TryFrom`/`TryInto` are also not too old! [https://github.com/paritytech/substrate/pull/163/files#r188938077](https://github.com/paritytech/substrate/pull/163/files#r188938077)
+* Remove `As`, which tried to fill the lack of `TryFrom/TryInto` [https://github.com/paritytech/substrate/pull/2602](https://github.com/paritytech/substrate/pull/2602)
+* Runtime Logging PR: [https://github.com/paritytech/substrate/pull/3821](https://github.com/paritytech/substrate/pull/3821)
+* Impl trait for tuples:
+  * [https://stackoverflow.com/questions/64332037/how-can-i-store-a-type-in-an-array](https://stackoverflow.com/questions/64332037/how-can-i-store-a-type-in-an-array)
+  * [https://doc.rust-lang.org/book/ch17-02-trait-objects.html#trait-objects-perform-dynamic-dispatch](https://doc.rust-lang.org/book/ch17-02-trait-objects.html#trait-objects-perform-dynamic-dispatch)
+  * [https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name](https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name)
+  * [https://turbo.fish/](https://turbo.fish/)
+  * [https://techblog.tonsser.com/posts/what-is-rusts-turbofish](https://techblog.tonsser.com/posts/what-is-rusts-turbofish)
+  * [https://docs.rs/impl-trait-for-tuples/latest/impl\_trait\_for\_tuples/](https://docs.rs/impl-trait-for-tuples/latest/impl_trait_for_tuples/)
+* std/no\_std
+  * [https://paritytech.github.io/substrate/master/sp\_std/index.html](https://paritytech.github.io/substrate/master/sp_std/index.html)
+  * [https://doc.rust-lang.org/core/index.html](https://doc.rust-lang.org/core/index.html)
+  * [https://doc.rust-lang.org/std/index.html](https://doc.rust-lang.org/std/index.html)
+  * [https://rust-lang.github.io/api-guidelines/naming.html#feature-names-are-free-of-placeholder-words-c-feature](https://rust-lang.github.io/api-guidelines/naming.html#feature-names-are-free-of-placeholder-words-c-feature)
 
-- Impl trait for tuples:
+#### Feedback After Lecture:
 
-  - <https://stackoverflow.com/questions/64332037/how-can-i-store-a-type-in-an-array>
-  - <https://doc.rust-lang.org/book/ch17-02-trait-objects.html#trait-objects-perform-dynamic-dispatch>
-  - <https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name>
-  - <https://turbo.fish/>
-  - <https://techblog.tonsser.com/posts/what-is-rusts-turbofish>
-  - <https://docs.rs/impl-trait-for-tuples/latest/impl_trait_for_tuples/>
-
-- std/no_std
-  - <https://paritytech.github.io/substrate/master/sp_std/index.html>
-  - <https://doc.rust-lang.org/core/index.html>
-  - <https://doc.rust-lang.org/std/index.html>
-  - <https://rust-lang.github.io/api-guidelines/naming.html#feature-names-are-free-of-placeholder-words-c-feature>
-
-### Feedback After Lecture:
-
-- Lecture is still kinda dense and long, try and trim
-- Update on defensive ops: <https://github.com/paritytech/substrate/pull/12967>
-- Next time, talk about making a storage struct be `<T: Config>`.
-- Cargo format
-- SignedExtension should technically be part of the substrate module. Integrate it in the
+* Lecture is still kinda dense and long, try and trim
+* Update on defensive ops: [https://github.com/paritytech/substrate/pull/12967](https://github.com/paritytech/substrate/pull/12967)
+* Next time, talk about making a storage struct be `<T: Config>`.
+* Cargo format
+* SignedExtension should technically be part of the substrate module. Integrate it in the\
   assignment, perhaps.
-- A section about `XXXNoBound` traits.
-- A section about reading your compiler errors top to bottom, especially with an example in FRAME.
+* A section about `XXXNoBound` traits.
+* A section about reading your compiler errors top to bottom, especially with an example in FRAME.

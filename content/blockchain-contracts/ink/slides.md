@@ -3,21 +3,23 @@ title: Wasm Smart Contracts in Ink!
 description: A working programmer’s guide to the crypto industry
 ---
 
-<img rounded style="width: 600px;" src="./img/ink-logo-with-squid-white.svg" />
-
 # Wasm Smart Contracts in Ink!
+
+![](img/ink-logo-with-squid-white.svg)
+
+## Wasm Smart Contracts in Ink!
 
 A working programmer’s guide
 
 Notes:
 
-- ask questions during the lecture, don't wait until the end
-- practical, but we go deeper where needed
-- some complexity is omitted in the examples (examples are not a production code)
+* ask questions during the lecture, don't wait until the end
+* practical, but we go deeper where needed
+* some complexity is omitted in the examples (examples are not a production code)
 
----
+***
 
-## Intro: ink! vs. Solidity
+### Intro: ink! vs. Solidity
 
 |                 | ink!                        | Solidity      |
 | --------------- | --------------------------- | ------------- |
@@ -31,86 +33,86 @@ Notes:
 
 Notes:
 
-- students are freshly of an EVM lecture so might be wondering why another SC language
-- Virtual Machine: any Wasm VM: yes in theory, in practice bound pretty close to the platform it runs on (Substrate & the contracts pallet)
-- Tooling: Solidity has been around for years, enjoys the first-to-market advantage (but ink! is a strong contender)
-- The EVM operates on 256 bit words (meaning anything less than 32 bytes will be treated by the EVM as having leading zeros)
+* students are freshly of an EVM lecture so might be wondering why another SC language
+* Virtual Machine: any Wasm VM: yes in theory, in practice bound pretty close to the platform it runs on (Substrate & the contracts pallet)
+* Tooling: Solidity has been around for years, enjoys the first-to-market advantage (but ink! is a strong contender)
+* The EVM operates on 256 bit words (meaning anything less than 32 bytes will be treated by the EVM as having leading zeros)
 
----
+***
 
-## Intro: ink! overview
+### Intro: ink! overview
 
-- DSL in Rust
-- Inherits all the benefits of Rust
-  - Modern functional language
-  - Type & Memory safety
-- Compiled to Wasm
-  - Ubiquitous
-  - Fast
-
-Notes:
-
-- ink! is not a separate language
-- enjoys access to a vast collection of libraries developed for other purposes
-- Wasm is targeting the browsers and quickly becoming the "assembly" od the web in lieu of JS
-
----
-
-## Intro: ink! & Substrate
-
-<img rounded style="width: 900px;" src="./img/lego0.png" />
+* DSL in Rust
+* Inherits all the benefits of Rust
+  * Modern functional language
+  * Type & Memory safety
+* Compiled to Wasm
+  * Ubiquitous
+  * Fast
 
 Notes:
 
-- Technically you could take a SC written in ink! and deploy it to any Wasm-powered blockchain.
-  - in practice not that straight-forward.
-- ink! is closely tied to the larger Substrate framework.
-- Substrate is a framework for developing customized blockchain runtimes from composable pallets.
+* ink! is not a separate language
+* enjoys access to a vast collection of libraries developed for other purposes
+* Wasm is targeting the browsers and quickly becoming the "assembly" od the web in lieu of JS
 
----
+***
 
-## Intro: ink! & Substrate
+### Intro: ink! & Substrate
 
-<img rounded style="width: 900px;" src="./img/lego1.png" />
-
-Notes:
-
-- contracts written in ink! are compiled to Wasm bytecode
-- pallet contracts provides
-  - instrumentation
-  - execution engine
-  - gas metering
-
----
-
-<img rounded style="width: 800px;" src="./img/schema1.png" />
+![](img/lego0.png)
 
 Notes:
 
-- pallet contracts is oblivious to the programming language
-- it accepts Wasm bytecode and executes it's instructions
+* Technically you could take a SC written in ink! and deploy it to any Wasm-powered blockchain.
+  * in practice not that straight-forward.
+* ink! is closely tied to the larger Substrate framework.
+* Substrate is a framework for developing customized blockchain runtimes from composable pallets.
 
----
+***
 
-<img rounded style="width: 800px;" src="./img/schema2.png" />
+### Intro: ink! & Substrate
 
-Notes:
-
-- contracts itself can be written in ink!
-
----
-
-<img rounded style="width: 800px;" src="./img/schema3.png" />
+![](img/lego1.png)
 
 Notes:
 
-- But also any other language that compilers to Wasm
-  - Solang
-  - or ask!
+* contracts written in ink! are compiled to Wasm bytecode
+* pallet contracts provides
+  * instrumentation
+  * execution engine
+  * gas metering
 
----
+***
 
-## Development: Prerequisites
+![](img/schema1.png)
+
+Notes:
+
+* pallet contracts is oblivious to the programming language
+* it accepts Wasm bytecode and executes it's instructions
+
+***
+
+![](img/schema2.png)
+
+Notes:
+
+* contracts itself can be written in ink!
+
+***
+
+![](img/schema3.png)
+
+Notes:
+
+* But also any other language that compilers to Wasm
+  * Solang
+  * or ask!
+
+***
+
+### Development: Prerequisites
 
 Install the required tooling
 
@@ -122,20 +124,20 @@ cargo install dylint-link
 cargo install cargo-contract --force
 ```
 
-- [binaryen](https://github.com/WebAssembly/binaryen) is a compiler for WebAssembly.
-- [dylint-link](https://github.com/trailofbits/dylint) adds DSL specific lints.
+* [binaryen](https://github.com/WebAssembly/binaryen) is a compiler for WebAssembly.
+* [dylint-link](https://github.com/trailofbits/dylint) adds DSL specific lints.
 
 Notes:
 
-- Binaryen is a compiler and toolchain infrastructure library for WebAssembly
-- at the moment ink! uses a few unstable Rust features, thus nightly is require
-- rust source code is needed to compile it to wasm
-- wasm target is added
-- cargo-contract is a batteries included CLI tool for compiling, deploying and interacting with the contracts
+* Binaryen is a compiler and toolchain infrastructure library for WebAssembly
+* at the moment ink! uses a few unstable Rust features, thus nightly is require
+* rust source code is needed to compile it to wasm
+* wasm target is added
+* cargo-contract is a batteries included CLI tool for compiling, deploying and interacting with the contracts
 
----
+***
 
-## Development: cargo-contract
+### Development: cargo-contract
 
 Create a contract
 
@@ -154,13 +156,11 @@ cargo contract new flipper
 
 Notes:
 
-- ask how many student have written some code in Rust, this should feel familiar to them
+* ask how many student have written some code in Rust, this should feel familiar to them
 
----
+***
 
-## Development: Cargo.toml
-
-<div style="font-size: 0.72em;">
+### Development: Cargo.toml
 
 ```toml
 [package]
@@ -185,20 +185,16 @@ std = [
 ]
 ```
 
-</div>
-
 Notes:
 
-- who knows why is the std library not included by default?
-- Answer: contracts are compiled to Wasm (executed ib a sandboxed environment with no system interfaces, no IO, no networking)
+* who knows why is the std library not included by default?
+* Answer: contracts are compiled to Wasm (executed ib a sandboxed environment with no system interfaces, no IO, no networking)
 
----
+***
 
-## Developing contracts
+### Developing contracts
 
 contract code
-
-<div style="font-size: 0.62em;">
 
 ```rust
 #[ink::contract]
@@ -233,17 +229,15 @@ pub mod flipper {
 }
 ```
 
-</div>
-
 Notes:
 
-- basic contract that flips a bit in storage
-- contract will have a storage definition, constructor(s), messages
-- grouped in a module
+* basic contract that flips a bit in storage
+* contract will have a storage definition, constructor(s), messages
+* grouped in a module
 
----
+***
 
-## Developing contracts: Compilation & artifacts
+### Developing contracts: Compilation & artifacts
 
 Compile:
 
@@ -270,15 +264,15 @@ You can find them in:
 
 Notes:
 
-- produces Wasm bytecode and some additional artifacts:
-- .wasm is the contract compiled bytecode
-- .json is contract ABI aka metadata (for use with e.g. dapps)
-  - definitions of events, storage, transactions
-- .contracts is both of these together
+* produces Wasm bytecode and some additional artifacts:
+* .wasm is the contract compiled bytecode
+* .json is contract ABI aka metadata (for use with e.g. dapps)
+  * definitions of events, storage, transactions
+* .contracts is both of these together
 
----
+***
 
-## Developing contracts: instantiate
+### Developing contracts: instantiate
 
 Deploy:
 
@@ -289,9 +283,7 @@ cargo contract instantiate --constructor default --suri //Alice
 
 Output:
 
-<div style="font-size: 0.82em;">
-
-```sh [13-14]
+```sh
  Dry-running default (skip with --skip-dry-run)
     Success! Gas required estimated at Weight(ref_time: 138893374, proof_size: 16689)
 ...
@@ -308,44 +300,33 @@ Output:
     Contract 5EXm8WLAGEXn6zy1ebHZ4MrLmjiNnHarZ1pBBjZ5fcnWF3G8
 ```
 
-</div>
-
 Notes:
 
-- we see a bunch of information on gas usage
-- we see two events one for storing contract code another for instantiating the contract
-  - why is that?
-  - code & instance are separated, we will come back to that
-- finally we see code hash and the newly created contracts address
+* we see a bunch of information on gas usage
+* we see two events one for storing contract code another for instantiating the contract
+  * why is that?
+  * code & instance are separated, we will come back to that
+* finally we see code hash and the newly created contracts address
 
----
+***
 
-## Interacting with the contracts: queries
+### Interacting with the contracts: queries
 
 ```sh
 cargo contract call --contract 5EXm8WLAGEXn6zy1ebHZ4MrLmjiNnHarZ1pBBjZ5fcnWF3G8
   --message get --suri //Alice --output-json
 ```
 
-- contract state?
-- tip: `default` constructor was called
+* contract state?
+* tip: `default` constructor was called
 
 Notes:
 
-- who can tell me what will be the contract state at this point?
+* who can tell me what will be the contract state at this point?
 
----
+***
 
-## Interacting with the contracts: queries
-
-<!-- Query the contract state: -->
-
-<!-- ```sh -->
-<!-- cargo contract call --contract 5EXm8WLAGEXn6zy1ebHZ4MrLmjiNnHarZ1pBBjZ5fcnWF3G8 -->
-<!--   --message get --suri //Alice --output-json -->
-<!-- ``` -->
-
-<!-- Result: -->
+### Interacting with the contracts: queries
 
 ```[6]
 "data": {
@@ -360,9 +341,9 @@ Notes:
 }
 ```
 
----
+***
 
-## Interacting: transactions
+### Interacting: transactions
 
 Sign and execute a transaction:
 
@@ -380,8 +361,6 @@ cargo contract call --contract 5EXm8WLAGEXn6zy1ebHZ4MrLmjiNnHarZ1pBBjZ5fcnWF3G8
 
 Result:
 
-<div style="font-size: 0.82em;">
-
 ```[6]
 "data": {
   "Tuple": {
@@ -395,49 +374,47 @@ Result:
 }
 ```
 
-</div>
+Notes:
+
+* if I query it again the bit is flipped
+* no surprises there
+
+***
+
+### Dev environment: Contracts UI
+
+![](img/contracts_ui_1.jpg)
 
 Notes:
 
-- if I query it again the bit is flipped
-- no surprises there
+* there is also a graphical env for deploying & interacting with contracts
+* deploy & create an instance of flipper
 
----
+***
 
-## Dev environment: Contracts UI
+### Dev environment: Contracts UI
 
-<img rounded style="width: 1400px;" src="./img/contracts_ui_1.jpg" />
-
-Notes:
-
-- there is also a graphical env for deploying & interacting with contracts
-- deploy & create an instance of flipper
-
----
-
-## Dev environment: Contracts UI
-
-<img rounded style="width: 1400px;" src="./img/contracts_ui_2.jpg" />
+![](img/contracts_ui_2.jpg)
 
 Notes:
 
-- call a transaction
+* call a transaction
 
----
+***
 
-## Dev environment: Contracts UI
+### Dev environment: Contracts UI
 
-<img rounded style="width: 1400px;" src="./img/contracts_ui_3.jpg" />
+![](img/contracts_ui_3.jpg)
 
 Notes:
 
-- query state
+* query state
 
----
+***
 
-## Developing contracts: Constructors
+### Developing contracts: Constructors
 
-```rust [7,12,17|13,18,7-9|2-4,8]
+```rust
 #[ink(storage)]
 pub struct Flipper {
     value: bool,
@@ -461,15 +438,15 @@ pub fn non_default() -> Self {
 
 Notes:
 
-- lets dissect what a contract code is built like
-- no limit of the number of constructors
-- constructors can call other constructors
-- constructors return the initial storage
-- a lot of complexity conveniently hidden behind macros
+* lets dissect what a contract code is built like
+* no limit of the number of constructors
+* constructors can call other constructors
+* constructors return the initial storage
+* a lot of complexity conveniently hidden behind macros
 
----
+***
 
-## Developing contracts: Queries
+### Developing contracts: Queries
 
 ```rust
 #[ink(message)]
@@ -478,21 +455,19 @@ pub fn get(&self) -> bool {
 }
 ```
 
-- `#[ink(message)]` is how we tell ink! this is a function that can be called on the contract
-- `&self` is a reference to the contract's storage
-
-<!-- #you’re calling this method on  -->
+* `#[ink(message)]` is how we tell ink! this is a function that can be called on the contract
+* `&self` is a reference to the contract's storage
 
 Notes:
 
-- returns information about the contract state stored on chain
-- reaches to the storage, decodes it and returns the value
+* returns information about the contract state stored on chain
+* reaches to the storage, decodes it and returns the value
 
----
+***
 
-## Developing contracts: Mutations
+### Developing contracts: Mutations
 
-```rust [1-2|6]
+```rust
 #[ink(message, payable)]
 pub fn place_bet(&mut self, bet_type: BetType) -> Result<()> {
     let player = self.env().caller();
@@ -502,24 +477,22 @@ pub fn place_bet(&mut self, bet_type: BetType) -> Result<()> {
     ...
 ```
 
-- `&mut self` is a mutable reference to the object you’re calling this method on
-- `payable` allows receiving value as part of the call to the ink! message
+* `&mut self` is a mutable reference to the object you’re calling this method on
+* `payable` allows receiving value as part of the call to the ink! message
 
 Notes:
 
-- constructors are inherently payable
-- ink! message will reject calls with funds if it's not marked as such
-- mutable references allow me to modify the storage.
-- queries are for free, mutations are metered (you pay gas)
-  - you will also pay for queries within such transactions
+* constructors are inherently payable
+* ink! message will reject calls with funds if it's not marked as such
+* mutable references allow me to modify the storage.
+* queries are for free, mutations are metered (you pay gas)
+  * you will also pay for queries within such transactions
 
----
+***
 
-## Contracts: Error handling
+### Contracts: Error handling
 
-<div style="font-size: 0.72em;">
-
-```rust [1-4|8-11,16|14,20]
+```rust
 pub enum MyResult<T, E> {
     Ok(value: T),
     Err(msg: E),
@@ -542,22 +515,20 @@ pub fn spin(&mut self) -> Result<()> {
 pub type Result<T> = core::result::Result<T, MyError>;
 ```
 
-</div>
-
-- ink! uses idiomatic Rust error handling: `Result<T,E>` type
-- Use the Err variant to pass your own semantics
-- Type aliases reduce boilerplate & enhance readability
+* ink! uses idiomatic Rust error handling: `Result<T,E>` type
+* Use the Err variant to pass your own semantics
+* Type aliases reduce boilerplate & enhance readability
 
 Notes:
 
-- ink! uses idiomatic Rust error handling
-- ~~messages are the `system boundary`~~
-- returning error variant or panicing reverts the transaction
-  - panicing is the same as returning Err variant (`Result` is just being nice)
+* ink! uses idiomatic Rust error handling
+* ~~messages are the `system boundary`~~
+* returning error variant or panicing reverts the transaction
+  * panicing is the same as returning Err variant (`Result` is just being nice)
 
----
+***
 
-## Error handling: call stack
+### Error handling: call stack
 
 ```rust
 #[ink(message)]
@@ -571,16 +542,16 @@ pub fn flip(&mut self) {
 }
 ```
 
-- what is the state of this contract if the tx is called in an odd block number?
+* what is the state of this contract if the tx is called in an odd block number?
 
 Notes:
 
-- answer: whatever it was prior to the tx:
-  - returning error variant reverts the entire tx on the call stack
+* answer: whatever it was prior to the tx:
+  * returning error variant reverts the entire tx on the call stack
 
----
+***
 
-## Contracts: Events
+### Contracts: Events
 
 ```rust
 #[ink(event)]
@@ -594,19 +565,19 @@ pub struct BetPlaced {
 }
 ```
 
-- Events are a way of letting the outside world know about what's happening inside the contract.
-- `#[ink(event)]` is a macro that defines events.
-- Topics mark fields for indexing.
+* Events are a way of letting the outside world know about what's happening inside the contract.
+* `#[ink(event)]` is a macro that defines events.
+* Topics mark fields for indexing.
 
 Notes:
 
-- events are especially important for dapps
-- storage is expensive: reading e.g. aggregate data from chain directly is impossible / impractical
-- dapps the can listen to the event, normalize & store off-chain and answer e.g. complex queries
+* events are especially important for dapps
+* storage is expensive: reading e.g. aggregate data from chain directly is impossible / impractical
+* dapps the can listen to the event, normalize & store off-chain and answer e.g. complex queries
 
----
+***
 
-## Contracts: Events
+### Contracts: Events
 
 ```rust
 #[ink(message)]
@@ -626,20 +597,18 @@ pub fn flip(&mut self) {
 }
 ```
 
-- What happens to the events from reverted transactions?
-- Will this event be emitted in an odd block?
+* What happens to the events from reverted transactions?
+* Will this event be emitted in an odd block?
 
 Notes:
 
-- answer: yes, but only because I reverted the condition :)
+* answer: yes, but only because I reverted the condition :)
 
----
+***
 
-## Contracts: Defining shared behaviour
+### Contracts: Defining shared behaviour
 
-<div style="font-size: 0.5em;">
-
-```rust [1-14|17,22]
+```rust
 #[ink::trait_definition]
 pub trait PSP22 {
     #[ink(message)]
@@ -666,21 +635,19 @@ impl SimpleDex {
     ...
 ```
 
-</div>
-
-- Trait Definition: `#[ink::trait_definition]`.
-- Sharing the trait definition to do a cross-contract call.
+* Trait Definition: `#[ink::trait_definition]`.
+* Sharing the trait definition to do a cross-contract call.
 
 Notes:
 
-- (part of) PSP22 (ERC20 like) contract definition
-- all contracts that respect this definition need to implement it
-- you can now share the trait definition with other contracts
-- while getting a typed reference to an instance
+* (part of) PSP22 (ERC20 like) contract definition
+* all contracts that respect this definition need to implement it
+* you can now share the trait definition with other contracts
+* while getting a typed reference to an instance
 
----
+***
 
-## Deeper dive: Storage
+### Deeper dive: Storage
 
 ```rust
 use ink::storage::Mapping;
@@ -696,27 +663,25 @@ pub struct Token {
 
 Notes:
 
-- now that we dipped our toes lets dissect more
-- starting with the storage
-- what does this code actually put into the chain storage?
+* now that we dipped our toes lets dissect more
+* starting with the storage
+* what does this code actually put into the chain storage?
 
----
+***
 
-<img rounded style="width: 1000px;" src="./img/storage.svg" />
+![](img/storage.svg)
 
-<font color="#8d3aed">SCALE</font> (_<font color="#8d3aed">S</font>imple <font color="#8d3aed">C</font>oncatenated <font color="#8d3aed">A</font>ggregate <font color="#8d3aed">L</font>ittle <font color="#8d3aed">E</font>ndian_)
+SCALE (_Simple Concatenated Aggregate Little Endian_)
 
 Notes:
 
-- Pallet contracts storage is organized like a key-value database
-- each storage cell has a unique storage key and points to a SCALE encoded value
-- SCALE codec is not self-describing (vide metadata)
+* Pallet contracts storage is organized like a key-value database
+* each storage cell has a unique storage key and points to a SCALE encoded value
+* SCALE codec is not self-describing (vide metadata)
 
----
+***
 
-## SCALE: examples of different types
-
-<div style="font-size: 0.72em;">
+### SCALE: examples of different types
 
 | Type         | Decoding                              | Encoding                     | Remark                                                                         |
 | ------------ | ------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------ |
@@ -725,21 +690,19 @@ Notes:
 | Unsigned int | 42                                    | 0x2a00                       |                                                                                |
 | Enum         | enum IntOrBool { Int(u8), Bool(bool)} | 0x002a and 0x0101            | first byte encodes the variant index, remaining bytes encode the data          |
 | Tuple        | (3, false)                            | 0x0c00                       | concatenation of each encoded value                                            |
-| Vector       | \[4, 8, 15, 16, 23, 42\]              | 0x18040008000f00100017002a00 | encoding of the vector length followed by conatenation of each item's encoding |
-| Struct       | {x:30u64, y:true}                     | \[0x1e,0x0,0x0,0x0,0x1\]     | names are ignored, Vec<u8> structure, only order matters                       |
-
-</div>
+| Vector       | \[4, 8, 15, 16, 23, 42]               | 0x18040008000f00100017002a00 | encoding of the vector length followed by conatenation of each item's encoding |
+| Struct       | {x:30u64, y:true}                     | \[0x1e,0x0,0x0,0x0,0x1]      | names are ignored, Vec structure, only order matters                           |
 
 Notes:
 
-- this table is not exhaustive
-- struct example: stored as an vector, names are ignored, only order matters, first four bytes encode the 64-byte integer and then the least significant bit of the last byte encodes the boolean
+* this table is not exhaustive
+* struct example: stored as an vector, names are ignored, only order matters, first four bytes encode the 64-byte integer and then the least significant bit of the last byte encodes the boolean
 
----
+***
 
-## Storage: Packed Layout
+### Storage: Packed Layout
 
-```rust [6]
+```rust
 use ink::storage::Mapping;
 
 #[ink(storage)]
@@ -751,21 +714,21 @@ pub struct Token {
 }
 ```
 
-- By default ink! stores all storage struct fields under a single storage cell (`Packed` layout)
+* By default ink! stores all storage struct fields under a single storage cell (`Packed` layout)
 
 Notes:
 
-- We talked about the kv database that the storage is, now how is it used precisely
-- Types that can be stored entirely under a single storage cell are called Packed Layout
-- by default ink! stores all storage struct fields under a single storage cell
-- as a consequence message interacting with the contract storage will always need to read and decode the entire contract storage struct
-- .. which may be what you want or not
+* We talked about the kv database that the storage is, now how is it used precisely
+* Types that can be stored entirely under a single storage cell are called Packed Layout
+* by default ink! stores all storage struct fields under a single storage cell
+* as a consequence message interacting with the contract storage will always need to read and decode the entire contract storage struct
+* .. which may be what you want or not
 
----
+***
 
-## Storage: Packed Layout
+### Storage: Packed Layout
 
-```rust [1-4,7]
+```rust
 use ink::storage::traits::{
     StorageKey,
     ManualKey,
@@ -777,14 +740,12 @@ pub struct Flipper<KEY: StorageKey = ManualKey<0xcafebabe>> {
 }
 ```
 
-- The storage key of the contracts root storage struct defaults to `0x00000000`
-- However you may store it under any arbitrary 4 bytes key instead
+* The storage key of the contracts root storage struct defaults to `0x00000000`
+* However you may store it under any arbitrary 4 bytes key instead
 
----
+***
 
-## Storage: Packed Layout
-
-<div style="font-size: 0.82em;">
+### Storage: Packed Layout
 
 ```json
 "storage": {
@@ -810,17 +771,15 @@ pub struct Flipper<KEY: StorageKey = ManualKey<0xcafebabe>> {
 }
 ```
 
-</div>
-
 Notes:
 
-- demonstration of the packed layout - value is stored under the root key
+* demonstration of the packed layout - value is stored under the root key
 
----
+***
 
-## Storage: Un-packed Layout
+### Storage: Un-packed Layout
 
-```rust [1,7-8]
+```rust
 use ink::storage::Mapping;
 
 #[ink(storage)]
@@ -832,20 +791,20 @@ pub struct Token {
 }
 ```
 
-- Mapping consists of a key-value pairs stored directly in the contract storage cells.
-- Each Mapping value lives under it's own storage key.
-- Mapping values do not have a contiguous storage layout: **it is not possible to iterate over the contents of a map!**
+* Mapping consists of a key-value pairs stored directly in the contract storage cells.
+* Each Mapping value lives under it's own storage key.
+* Mapping values do not have a contiguous storage layout: **it is not possible to iterate over the contents of a map!**
 
 Notes:
 
-- Use Mapping when you need to store a lot of values of the same type.
-- if your message only accesses a single key of a Mapping, it will not load the whole mapping but only the value being accessed.
-- there are other collection types in ink!: HashMap or BTreeMap (to name a few).
-  - these data structures are all Packed, unlike Mapping!
+* Use Mapping when you need to store a lot of values of the same type.
+* if your message only accesses a single key of a Mapping, it will not load the whole mapping but only the value being accessed.
+* there are other collection types in ink!: HashMap or BTreeMap (to name a few).
+  * these data structures are all Packed, unlike Mapping!
 
----
+***
 
-## Storage: working with `Mapping`
+### Storage: working with `Mapping`
 
 ```rust
 pub fn transfer(&mut self) {
@@ -858,19 +817,19 @@ pub fn transfer(&mut self) {
 }
 ```
 
-- what is wrong here?
+* what is wrong here?
 
 Notes:
 
-- working with mapping:
-- Answer: Mapping::get() method will result in an owned value (a local copy), as opposed to a direct reference into the storage.
-  Changes to this value won't be reflected in the contract's storage "automatically".
-  To avoid this common pitfall, the value must be inserted again at the same key after it was modified.
+* working with mapping:
+* Answer: Mapping::get() method will result in an owned value (a local copy), as opposed to a direct reference into the storage.\
+  Changes to this value won't be reflected in the contract's storage "automatically".\
+  To avoid this common pitfall, the value must be inserted again at the same key after it was modified.\
   The transfer function from above example illustrates this:
 
----
+***
 
-## Storage: working with `Mapping`
+### Storage: working with `Mapping`
 
 ```rust
 pub fn transfer(&mut self) {
@@ -883,20 +842,20 @@ pub fn transfer(&mut self) {
 }
 ```
 
-- `Mapping::get()` returns a local copy, not a mutable reference to the storage!
+* `Mapping::get()` returns a local copy, not a mutable reference to the storage!
 
 Notes:
 
-- working with mapping:
-- `Mapping::get()` method will result in an owned value (a local copy).
-- Changes to this value won't be reflected in the contract's storage at all!
-- you need to inserted it again at the same key.
+* working with mapping:
+* `Mapping::get()` method will result in an owned value (a local copy).
+* Changes to this value won't be reflected in the contract's storage at all!
+* you need to inserted it again at the same key.
 
----
+***
 
-## Storage: Lazy
+### Storage: Lazy
 
-```rust [1,5]
+```rust
 use ink::storage::{traits::ManualKey, Lazy, Mapping};
 
 #[ink(storage)]
@@ -906,36 +865,36 @@ pub struct Roulette {
 }
 ```
 
-- Every type wrapped in `Lazy` has a separate storage cell.
-- `ManualKey` assignes explicit storage key to it.
-- Why would you want to use a `ManualKey` instead of a generated one?
+* Every type wrapped in `Lazy` has a separate storage cell.
+* `ManualKey` assignes explicit storage key to it.
+* Why would you want to use a `ManualKey` instead of a generated one?
 
 Notes:
 
-- packed layout can get problematic if we're storing a large collection in the contracts storage that most of the transactions do not need access too
-- there is a 16kb hard limit on a buffer used for decoding, contract trying to decode more will trap / revert
-- lazy provides per-cell access, like a mapping
-- lazy storage cell can be auto-assigned or chosen manually
-- using ManualKey instead of AutoKey might be especially desirable for upgradable contracts, as using AutoKey might result in a different storage key for the same field in a newer version of the contract.
-  - This may break your contract after an upgrade!
+* packed layout can get problematic if we're storing a large collection in the contracts storage that most of the transactions do not need access too
+* there is a 16kb hard limit on a buffer used for decoding, contract trying to decode more will trap / revert
+* lazy provides per-cell access, like a mapping
+* lazy storage cell can be auto-assigned or chosen manually
+* using ManualKey instead of AutoKey might be especially desirable for upgradable contracts, as using AutoKey might result in a different storage key for the same field in a newer version of the contract.
+  * This may break your contract after an upgrade!
 
----
+***
 
-## Storage: Lazy
+### Storage: Lazy
 
-<img rounded style="width: 1000px;" src="./img/storage-layout.svg" />
+![](img/storage-layout.svg)
 
 Notes:
 
-- only the pointer (the key) to the lazy type is stored under the root key.
-- only when there is a read of `d` will the pointer be de-referenced and it's value decoded.
-- lazy is a bit of a mis-nomer here, because storage is already initialized.
+* only the pointer (the key) to the lazy type is stored under the root key.
+* only when there is a read of `d` will the pointer be de-referenced and it's value decoded.
+* lazy is a bit of a mis-nomer here, because storage is already initialized.
 
----
+***
 
-## Contracts upgradeability: `set_code_hash`
+### Contracts upgradeability: `set_code_hash`
 
-```rust [3]
+```rust
 #[ink(message)]
 pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<()> {
     ink::env::set_code_hash(&code_hash)?;
@@ -943,23 +902,23 @@ pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<()> {
 }
 ```
 
-- Within SC's lifecycle it is often necessary to perform an upgrade or a bugfix.
-- Contract's code and it's instance are separated.
-- Contract's address can be updated to point to a different code stored on-chain.
+* Within SC's lifecycle it is often necessary to perform an upgrade or a bugfix.
+* Contract's code and it's instance are separated.
+* Contract's address can be updated to point to a different code stored on-chain.
 
 Notes:
 
-- append only != immutable
-- proxy pattern known from e.g. solidity is still possible
-- within the Substrate framework contract's code is stored on-chain and it's instance is a pointer to that code
-- incentivizes cleaning up after oneself
-- big storage optimization
+* append only != immutable
+* proxy pattern known from e.g. solidity is still possible
+* within the Substrate framework contract's code is stored on-chain and it's instance is a pointer to that code
+* incentivizes cleaning up after oneself
+* big storage optimization
 
----
+***
 
-## Contracts upgradeability: access control
+### Contracts upgradeability: access control
 
-```rust [3]
+```rust
 #[ink(message)]
 pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<()> {
     ensure_owner(self.env().caller())?;
@@ -970,17 +929,15 @@ pub fn set_code(&mut self, code_hash: [u8; 32]) -> Result<()> {
 
 Notes:
 
-- you DO NOT want to leave this message un-guarded
-- solutions to `ensure_owner` can range from a very simple ones address checks
-- to a multiple-role database of access controlled accounts stored and maintained in a separate contract
+* you DO NOT want to leave this message un-guarded
+* solutions to `ensure_owner` can range from a very simple ones address checks
+* to a multiple-role database of access controlled accounts stored and maintained in a separate contract
 
----
+***
 
-## Upgradeability: storage
+### Upgradeability: storage
 
-<div style="font-size: 0.72em;">
-
-```rust [1-4,6-10|1-4,12-16|18-21|23-26]
+```rust
 #[ink(message)]
 pub fn get_values(&self) -> (u32, bool) {
     (self.x, self.y)
@@ -999,27 +956,23 @@ pub struct MyContractNew {
 }
 ```
 
-</div>
-
-- Make sure your updated code is compatible with the existing contracts state.
-- Will the getter work with the new definition and the old storage ?
+* Make sure your updated code is compatible with the existing contracts state.
+* Will the getter work with the new definition and the old storage ?
 
 Notes:
 
-- Various potential changes that can result in backwards incompatibility:
-  - Changing the order of variables
-  - Introducing new variable(s) before any of the existing ones
-  - Changing variable type(s)
-  - Removing variables
-- Answer: no, SCALE encoding is oblivious to names, only order matters
+* Various potential changes that can result in backwards incompatibility:
+  * Changing the order of variables
+  * Introducing new variable(s) before any of the existing ones
+  * Changing variable type(s)
+  * Removing variables
+* Answer: no, SCALE encoding is oblivious to names, only order matters
 
----
+***
 
-## Upgradeability: storage migrations
+### Upgradeability: storage migrations
 
-<div style="font-size: 0.82em;">
-
-```rust [1-13|15-17]
+```rust
 // new contract code
 #[ink(message)]
 pub fn migrate(&mut self) -> Result<()> {
@@ -1039,20 +992,18 @@ pub fn migrate(&mut self) -> Result<()> {
 pub fn set_code(&mut self, code_hash: [u8; 32], callback: Option<Selector>)
 ```
 
-</div>
-
 Notes:
 
-- if the new contract code does not match the stored state you can perform a storage migration
-- think of regular relational DB and schema migrations
-- a good pattern to follow is to perform the update and the migration in one atomic transaction:
-  - if anything fails whole tx is reverted
-  - won't end up in a broken state
-  - make sure it can fit into one block!
+* if the new contract code does not match the stored state you can perform a storage migration
+* think of regular relational DB and schema migrations
+* a good pattern to follow is to perform the update and the migration in one atomic transaction:
+  * if anything fails whole tx is reverted
+  * won't end up in a broken state
+  * make sure it can fit into one block!
 
----
+***
 
-## Common Vulnerabilities
+### Common Vulnerabilities
 
 ```rust
 impl MyContract {
@@ -1067,57 +1018,35 @@ impl MyContract {
 }
 ```
 
-- What is wrong with this contract?
-- How would you fix it?
+* What is wrong with this contract?
+* How would you fix it?
 
 Notes:
 
-- we start easy
-- answer: no AC in place
-- parity wallet 150 million `hack`
+* we start easy
+* answer: no AC in place
+* parity wallet 150 million `hack`
 
----
+***
 
-## Common Vulnerabilities: blast from the past
+### Common Vulnerabilities: blast from the past
 
-<img rounded style="width: 900px;" src="./img/anyone_can_kill_it.jpg" />
+![](img/anyone_can_kill_it.jpg)
 
-<div style="font-size: 0.72em;">
-
-- [Details](https://github.com/openethereum/parity-ethereum/issues/6995) of the exploit:
-- <https://etherscan.io/address/0x863df6bfa4469f3ead0be8f9f2aae51c91a907b4#code>
-
-<!-- ```solidity -->
-<!-- function kill(address _to) onlymanyowners(sha3(msg.data)) external { -->
-<!--   suicide(_to); -->
-<!-- } -->
-
-<!-- function initMultiowned(address[] _owners, uint _required) only_uninitialized { -->
-<!--   m_numOwners = _owners.length + 1; -->
-<!--   m_owners[1] = uint(msg.sender); -->
-<!--   m_ownerIndex[uint(msg.sender)] = 1; -->
-<!--   for (uint i = 0; i < _owners.length; ++i) -->
-<!--   { -->
-<!--     m_owners[2 + i] = uint(_owners[i]); -->
-<!--     m_ownerIndex[uint(_owners[i])] = 2 + i; -->
-<!--   } -->
-<!--   m_required = _required; -->
-<!-- } -->
-<!-- ``` -->
-
-</div>
+* [Details](https://github.com/openethereum/parity-ethereum/issues/6995) of the exploit:
+* [https://etherscan.io/address/0x863df6bfa4469f3ead0be8f9f2aae51c91a907b4#code](https://etherscan.io/address/0x863df6bfa4469f3ead0be8f9f2aae51c91a907b4#code)
 
 Notes:
 
-- might seem trivial but a very similar hack has happend in the past trapping a lot of funds
-- see: <https://etherscan.io/address/0x863df6bfa4469f3ead0be8f9f2aae51c91a907b4#code>
-- hacker has "accidentally" called an unprotected `initMultiowned` and proceeded to delete the contract code
+* might seem trivial but a very similar hack has happend in the past trapping a lot of funds
+* see: [https://etherscan.io/address/0x863df6bfa4469f3ead0be8f9f2aae51c91a907b4#code](https://etherscan.io/address/0x863df6bfa4469f3ead0be8f9f2aae51c91a907b4#code)
+* hacker has "accidentally" called an unprotected `initMultiowned` and proceeded to delete the contract code
 
----
+***
 
-## Common Vulnerabilities
+### Common Vulnerabilities
 
-```rust [3,8,12-14]
+```rust
     #[ink(storage)]
     pub struct SubstrateNameSystem {
         registry: Mapping<AccountId, Vec<u8>>,
@@ -1135,23 +1064,21 @@ Notes:
         }
 ```
 
-- On-chain domain name registry with a register fee of 100 pico.
-- Why is this a bad idea?
+* On-chain domain name registry with a register fee of 100 pico.
+* Why is this a bad idea?
 
 Notes:
 
-- everything on-chain is public
-- this will be front-run in no time
-- Can you propose a better design?
-- Answer: commit / reveal or an auction
+* everything on-chain is public
+* this will be front-run in no time
+* Can you propose a better design?
+* Answer: commit / reveal or an auction
 
----
+***
 
-## Common Vulnerabilities
+### Common Vulnerabilities
 
-<div style="font-size: 0.72em;">
-
-```rust [3-7,12,18]
+```rust
 #[ink(message)]
 pub fn swap(
     &mut self,
@@ -1173,26 +1100,24 @@ pub fn swap(
 }
 ```
 
-</div>
-
-- Contract is a <font color="#8d3aed">DEX</font> <font color="#8d3aed">D</font>ecentralized <font color="#8d3aed">EX</font>change, follows the popular <font color="#8d3aed">AMM</font> (<font color="#8d3aed">A</font>utomated <font color="#8d3aed">M</font>arket <font color="#8d3aed">M</font>aker) design.
-- Tx swaps the specified amount of one of the pool's PSP22 tokens to another PSP22 token according to the current price.
-- What can go wrong here?
+* Contract is a DEX Decentralized EXchange, follows the popular AMM (Automated Market Maker) design.
+* Tx swaps the specified amount of one of the pool's PSP22 tokens to another PSP22 token according to the current price.
+* What can go wrong here?
 
 Notes:
 
 Answer:
 
-- no slippage protection in place.
-- bot will frontrun the victim's tx by purchasing token_out before the trade is executed.
-- this purchase will raise the price of the asset for the victim trader and increases his slippage
-- if the bot sells right after the victims tx (back runs the victim) this is a sandwich attack
+* no slippage protection in place.
+* bot will frontrun the victim's tx by purchasing token\_out before the trade is executed.
+* this purchase will raise the price of the asset for the victim trader and increases his slippage
+* if the bot sells right after the victims tx (back runs the victim) this is a sandwich attack
 
----
+***
 
-## Common Vulnerabilities
+### Common Vulnerabilities
 
-```rust [7,12-14]
+```rust
 #[ink(message)]
 pub fn swap(
     &mut self,
@@ -1214,109 +1139,40 @@ pub fn swap(
 
 Notes:
 
-- slippage protection in place
+* slippage protection in place
 
----
+***
 
-## Common Vulnerabilities
+### Common Vulnerabilities
 
-- Integer overflows
-- Re-entrancy vulnerabilities
-- Sybil attacks
-- ...
-- Regulatory attacks 😅
-- ...
+* Integer overflows
+* Re-entrancy vulnerabilities
+* Sybil attacks
+* ...
+* Regulatory attacks 😅
+* ...
 
 Notes:
 
-- long list of possible attacks
-- too long to fit into one lecture
-- baseline: get an audit from a respectable firm
-- publish your source code (security by obscurity is not security)
+* long list of possible attacks
+* too long to fit into one lecture
+* baseline: get an audit from a respectable firm
+* publish your source code (security by obscurity is not security)
 
----
+***
 
-## Pause
+### Pause
 
 Optional challenge: [github.com/Polkadot-Blockchain-Academy/adder](https://github.com/Polkadot-Blockchain-Academy/ink-adder)
 
 Notes:
 
-Piotr takes over to talk about making runtime calls from contracts and writing automated tests.
+Piotr takes over to talk about making runtime calls from contracts and writing automated tests.\
 There is a 15 minute challenge for you in the meantime.
 
----
+***
 
-## Interacting with the execution environment
-
-```rust [5-6]
-impl MyContract {
-  ...
-  #[ink(message)]
-  pub fn terminate(&mut self) -> Result<()> {
-      let caller = self.env().caller();
-      self.env().terminate_contract(caller)
-  }
-  ...
-}
-```
-
----
-
-## Blockchain node onion
-
----
-
-## Blockchain node onion
-
-<br />
-
-<img style="margin-top: 50px;margin-bottom: 50px" width="800" src="./img/onions.png" />
-
----
-
-## Blockchain node onion
-
-<img style="margin-top: 10px" width="600" src="./img/blockchain-onion-1.svg" />
-
-- networking
-- block production, dissemination, finalization
-- storage management
-- off-chain maintenance, querying, indexing
-
----
-
-## Blockchain node onion
-
-<img style="margin-top: 50px;margin-bottom: 50px" width="800" src="./img/blockchain-onion-2.svg" />
-
-- computing new state based on the previous one and a single transaction
-
----
-
-## Blockchain node onion
-
-<img style="margin-top: 100px;margin-bottom: 50px" width="800" src="./img/blockchain-onion-3.svg" />
-
-- executing contract calls
-
----
-
-## Standard API
-
-- `caller()`
-- `account_id()`
-- `balance()`
-- `block_number()`
-- `emit_event(event: Event)`
-- `transfer(dest: AccountId, value: Balance)`
-- `hash_bytes(input: &[u8], output: &mut [u8])`
-- `debug_message(msg: &str)`
-- [_and many more_](https://docs.rs/ink_env/4.2.1/ink_env/index.html#functions)
-
----
-
-## Standard API
+### Interacting with the execution environment
 
 ```rust
 impl MyContract {
@@ -1330,93 +1186,143 @@ impl MyContract {
 }
 ```
 
----
+***
 
-## Interacting with the state transition function
+### Blockchain node onion
 
-<br />
+***
 
-<div class="flex-container fragment">
-<div class="left">
-<div style="text-align: center"> <center><h2><pre> User API </pre></h2></center> </div>
+### Blockchain node onion
 
-<ul>
-<li>token transfer</li>
-<li>staking</li>
-<li>voting</li>
-<li>contract call</li>
-<li>...</li>
-</ul>
-</div>
+\
+![](img/onions.png)
 
-<div class="left fragment">
-<div style="text-align: center"> <center><h2><pre> Contract API </pre></h2></center> </div>
+***
 
-<ul>
-<li>advanced cryptography</li>
-<li>bypassing standard restrictions</li>
-<li>outsourcing computation</li>
-<li>...</li>
-</ul>
-</div>
-</div>
+### Blockchain node onion
 
----
+![](img/blockchain-onion-1.svg)
 
-## Interacting with the state transition function
+* networking
+* block production, dissemination, finalization
+* storage management
+* off-chain maintenance, querying, indexing
 
-<br />
+***
 
-<div class="flex-container">
-<div class="left">
-<div style="text-align: center"> <center><h2><pre> User API </pre></h2></center> </div>
-<div style="text-align: center"> <center><h2><pre> (usually for humans) </pre></h2></center> </div>
+### Blockchain node onion
 
-<ul>
-<li>token transfer</li>
-<li>staking</li>
-<li>voting</li>
-<li>contract call</li>
-<li>...</li>
+![](img/blockchain-onion-2.svg)
 
-**_runtime call_**
+* computing new state based on the previous one and a single transaction
 
-</ul>
-</div>
+***
 
-<div class="left">
-<div style="text-align: center"> <center><h2><pre> Contract API </pre></h2></center> </div>
-<div style="text-align: center"> <center><h2><pre> (only for contracts) </pre></h2></center> </div>
+### Blockchain node onion
 
-<ul>
-<li>advanced cryptography</li>
-<li>bypassing standard restrictions</li>
-<li>outsourcing computation</li>
-<li>...</li>
+![](img/blockchain-onion-3.svg)
 
-<br />
+* executing contract calls
 
-**_chain extension_**
+***
 
-</ul>
-</div>
-</div>
+### Standard API
 
----
+* `caller()`
+* `account_id()`
+* `balance()`
+* `block_number()`
+* `emit_event(event: Event)`
+* `transfer(dest: AccountId, value: Balance)`
+* `hash_bytes(input: &[u8], output: &mut [u8])`
+* `debug_message(msg: &str)`
+* [_and many more_](https://docs.rs/ink_env/4.2.1/ink_env/index.html#functions)
 
-## Runtime
+***
 
-<br />
+### Standard API
 
-In Polkadot ecosystem _state transition function_ is called **_runtime_**
+```rust
+impl MyContract {
+  ...
+  #[ink(message)]
+  pub fn terminate(&mut self) -> Result<()> {
+      let caller = self.env().caller();
+      self.env().terminate_contract(caller)
+  }
+  ...
+}
+```
 
----
+***
 
-## Calling runtime
+### Interacting with the state transition function
 
-<br />
+\
 
-```rust [7-10]
+
+### &#x20;User API&#x20;
+
+* token transfer
+* staking
+* voting
+* contract call
+* ...
+
+### &#x20;Contract API&#x20;
+
+* advanced cryptography
+* bypassing standard restrictions
+* outsourcing computation
+* ...
+
+***
+
+### Interacting with the state transition function
+
+\
+
+
+### &#x20;User API&#x20;
+
+### &#x20;(usually for humans)&#x20;
+
+* token transfer
+* staking
+* voting
+* contract call
+* ...
+* _**runtime call**_
+
+### &#x20;Contract API&#x20;
+
+### &#x20;(only for contracts)&#x20;
+
+* advanced cryptography
+* bypassing standard restrictions
+* outsourcing computation
+* ...
+* \
+
+* _**chain extension**_
+
+***
+
+### Runtime
+
+\
+
+
+In Polkadot ecosystem _state transition function_ is called _**runtime**_
+
+***
+
+### Calling runtime
+
+\
+
+
+```rust
 #[ink(message)]
 pub fn transfer_through_runtime(
     &mut self,
@@ -1432,13 +1338,14 @@ pub fn transfer_through_runtime(
 }
 ```
 
----
+***
 
-## Calling runtime
+### Calling runtime
 
-<br />
+\
 
-```rust [12]
+
+```rust
 #[ink(message)]
 pub fn transfer_through_runtime(
     &mut self,
@@ -1454,37 +1361,40 @@ pub fn transfer_through_runtime(
 }
 ```
 
----
+***
 
-## Chain extensions
+### Chain extensions
 
-<br />
+\
+
 
 Chain extension is a way to extend the runtime with custom functionalities _dedicated to contracts_.
 
----
+***
 
-## Chain extensions
+### Chain extensions
 
-<br />
+\
+
 
 **ink! side:**
 
-- provide `ChainExtension` trait
-- include extension in the `Environment` trait instantiation
+* provide `ChainExtension` trait
+* include extension in the `Environment` trait instantiation
 
-<br />
+\
+
 
 **runtime side:**
 
-- handling extension calls
-- extension logic itself
+* handling extension calls
+* extension logic itself
 
----
+***
 
-## Provide `ChainExtension` trait
+### Provide `ChainExtension` trait
 
-```rust [1-7]
+```rust
 #[ink::chain_extension]
 pub trait OutsourceHeavyCrypto {
   type ErrorCode = OutsourcingErr;
@@ -1508,11 +1418,11 @@ impl ink::env::chain_extension::FromStatusCode for OutsourcingErr {
 }
 ```
 
----
+***
 
-## Provide `ChainExtension` trait
+### Provide `ChainExtension` trait
 
-```rust [9-21]
+```rust
 #[ink::chain_extension]
 pub trait OutsourceHeavyCrypto {
   type ErrorCode = OutsourcingErr;
@@ -1536,11 +1446,12 @@ impl ink::env::chain_extension::FromStatusCode for OutsourcingErr {
 }
 ```
 
----
+***
 
-## Include extension in the `Environment` trait instantiation
+### Include extension in the `Environment` trait instantiation
 
-<br />
+\
+
 
 ```rust
 pub enum EnvironmentWithOutsourcing {}
@@ -1555,11 +1466,12 @@ mod my_contract {
 }
 ```
 
----
+***
 
-## Include extension in the `Environment` trait instantiation
+### Include extension in the `Environment` trait instantiation
 
-<br />
+\
+
 
 ```rust
 #[ink::contract(env = crate::EnvironmentWithOutsourcing)]
@@ -1570,13 +1482,14 @@ mod my_contract {
 }
 ```
 
----
+***
 
-## Handling extension calls
+### Handling extension calls
 
-<br />
+\
 
-```rust [5-11]
+
+```rust
 pub struct HeavyCryptoOutsourcingExtension;
 
 impl ChainExtension<Runtime> for HeavyCryptoOutsourcingExtension {
@@ -1592,37 +1505,37 @@ impl ChainExtension<Runtime> for HeavyCryptoOutsourcingExtension {
 }
 ```
 
----
+***
 
-## Chain extension: reaching even further
+### Chain extension: reaching even further
 
-<img style="margin-top: 100px;margin-bottom: 50px" width="800" src="./img/chain-extension-reach.svg" />
+![](img/chain-extension-reach.svg)
 
----
+***
 
-## Testing contracts
+### Testing contracts
 
----
+***
 
-## Testing contracts
+### Testing contracts
 
-<br />
+\
+![](img/blockchain-onion-3.svg)
 
-<img style="margin-top: 100px;margin-bottom: 50px" width="800" src="./img/blockchain-onion-3.svg" />
+***
 
----
+### Testing contracts
 
-## Testing contracts
+![](img/testing-contract-stack.svg)
 
-<img style="margin-top: 100px;margin-bottom: 50px" width="1000" src="./img/testing-contract-stack.svg" />
+***
 
----
+### Unit tests
 
-## Unit tests
+\
 
-<br />
 
-```rust [1-3]
+```rust
 #[ink::test]
 fn erc20_transfer_works() {
   let mut erc20 = Erc20::new(100);
@@ -1647,13 +1560,14 @@ fn erc20_transfer_works() {
 }
 ```
 
----
+***
 
-## Unit tests
+### Unit tests
 
-<br />
+\
 
-```rust [5-9]
+
+```rust
 #[ink::test]
 fn erc20_transfer_works() {
   let mut erc20 = Erc20::new(100);
@@ -1678,13 +1592,14 @@ fn erc20_transfer_works() {
 }
 ```
 
----
+***
 
-## Unit tests
+### Unit tests
 
-<br />
+\
 
-```rust [11-22]
+
+```rust
 #[ink::test]
 fn erc20_transfer_works() {
   let mut erc20 = Erc20::new(100);
@@ -1709,13 +1624,14 @@ fn erc20_transfer_works() {
 }
 ```
 
----
+***
 
-## E2E tests
+### E2E tests
 
-<br />
+\
 
-```rust [1-7]
+
+```rust
 #[ink_e2e::test]
 async fn e2e_transfer(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
   let constructor = Erc20Ref::new(total_supply);
@@ -1733,13 +1649,14 @@ async fn e2e_transfer(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
 }
 ```
 
----
+***
 
-## E2E tests
+### E2E tests
 
-<br />
+\
 
-```rust [9-13]
+
+```rust
 #[ink_e2e::test]
 async fn e2e_transfer(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
   let constructor = Erc20Ref::new(total_supply);
@@ -1757,13 +1674,14 @@ async fn e2e_transfer(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
 }
 ```
 
----
+***
 
-## E2E tests
+### E2E tests
 
-<br />
+\
 
-```rust [14]
+
+```rust
 #[ink_e2e::test]
 async fn e2e_transfer(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
   let constructor = Erc20Ref::new(total_supply);
@@ -1781,61 +1699,60 @@ async fn e2e_transfer(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
 }
 ```
 
----
+***
 
-## E2E pipeline: traps, traps everywhere
-
-<div style="font-size: 0.6em">
+### E2E pipeline: traps, traps everywhere
 
 1. Preparing and encoding transaction data (_client side_)
-1. Signing the transaction (_client side_)
-1. Sending transaction to a node (_client side_)
-1. Block and event subscribing (_client side_)
-1. Transaction pool processing (_node side_)
-1. Block building (_node side_)
-1. Block dissemination (_node side_)
-1. Import queue processing (_node side_)
-1. Block finalizing (_node side_)
-1. Block execution (_node side_)
-1. Transaction execution (_runtime side_)
-1. Event emitting (_node side_)
-1. Event capturing (_client side_)
-1. Event processing (_client side_)
-1. State fetching via RPC calling (_client side_)
-1. State report (_node side_)
-1. State validation (_client side_)
+2. Signing the transaction (_client side_)
+3. Sending transaction to a node (_client side_)
+4. Block and event subscribing (_client side_)
+5. Transaction pool processing (_node side_)
+6. Block building (_node side_)
+7. Block dissemination (_node side_)
+8. Import queue processing (_node side_)
+9. Block finalizing (_node side_)
+10. Block execution (_node side_)
+11. Transaction execution (_runtime side_)
+12. Event emitting (_node side_)
+13. Event capturing (_client side_)
+14. Event processing (_client side_)
+15. State fetching via RPC calling (_client side_)
+16. State report (_node side_)
+17. State validation (_client side_)
 
-</div>
+***
 
----
+### E2E pipeline: traps, traps everywhere
 
-## E2E pipeline: traps, traps everywhere
+![](img/trap.gif)
 
-<img style="margin-top: 100px;margin-bottom: 50px" width="800" src="./img/trap.gif" />
+***
 
----
+### Test core
 
-## Test core
+\
 
-<br />
 
 1. Preparing and encoding transaction data (_given_)
-1. Transaction execution (_when_)
-1. State validation (_then_)
+2. Transaction execution (_when_)
+3. State validation (_then_)
 
----
+***
 
-## quasi-E2E tests
+### quasi-E2E tests
 
-<br />
+\
+
 
 Interact directly with runtime, skipping node layer.
 
----
+***
 
-## quasi-E2E tests
+### quasi-E2E tests
 
-<br />
+\
+
 
 ```rust
 #[test]
@@ -1855,6 +1772,6 @@ fn flipping() -> Result<(), Box<dyn Error>> {
 }
 ```
 
----
+***
 
-## Local playing with contracts using `drink-cli`
+### Local playing with contracts using `drink-cli`

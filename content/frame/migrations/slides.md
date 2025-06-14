@@ -5,34 +5,34 @@ description: Runtime upgrades and how to survive them
 
 # Migrations and Try Runtime
 
----
+***
 
 ## Runtime upgrades...
 
 ### _and how to survive them_
 
----
+***
 
 ### _At the end of this lecture, you will be able to:_
 
-- Justify when runtime migrations are needed.
-- Write a the full a runtime upgrade that includes migrations, end-to-end.
-- Test runtime upgrades before executing on a network using `try-runtime` and `remote-externalities`.
+* Justify when runtime migrations are needed.
+* Write a the full a runtime upgrade that includes migrations, end-to-end.
+* Test runtime upgrades before executing on a network using `try-runtime` and `remote-externalities`.
 
----
+***
 
 ## When is a Migration Required?
 
----v
+\---v
 
 ### When is a Migration Required?
 
-- In a typical runtime upgrade, you typically only replace `:code:`. This is _**Runtime Upgrade**_.
-- If you change the _storage layout_, then this is also a _**Runtime Migration**_.
+* In a typical runtime upgrade, you typically only replace `:code:`. This is _**Runtime Upgrade**_.
+* If you change the _storage layout_, then this is also a _**Runtime Migration**_.
 
 > Anything that changes **encoding** is a migration!
 
----v
+\---v
 
 ### When is a Migration Required?
 
@@ -48,11 +48,9 @@ pub struct Foo(u32)
 pub struct Foo(u64)
 ```
 
-- A clear migration.
+* A clear migration.
 
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### When is a Migration Required?
 
@@ -70,11 +68,9 @@ pub struct Foo(i32)
 pub struct Foo(u16, u16)
 ```
 
-- The data still _fits_, but the _interpretations_ is almost certainly different!
+* The data still _fits_, but the _interpretations_ is almost certainly different!
 
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### When is a Migration Required?
 
@@ -90,11 +86,9 @@ pub struct Foo { a: u32, b: u32 }
 pub struct Foo { a: u32, b: u32, c: u32 }
 ```
 
-- This is still a migration, because `Foo`'s decoding changed.
+* This is still a migration, because `Foo`'s decoding changed.
 
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### When is a Migration Required?
 
@@ -110,11 +104,9 @@ pub struct Foo { a: u32, b: u32 }
 pub struct Foo { a: u32, b: u32, c: PhantomData<_> }
 ```
 
-- If for whatever reason `c` has a type that its encoding is like `()`, then this would work.
+* If for whatever reason `c` has a type that its encoding is like `()`, then this would work.
 
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### When is a Migration Required?
 
@@ -130,15 +122,10 @@ pub enum Foo { A(u32), B(u32) }
 pub enum Foo { A(u32), B(u32), C(u128) }
 ```
 
-- Extending an enum is even more interesting, because if you add the variant to the end, no migration is needed.
+* Extending an enum is even more interesting, because if you add the variant to the end, no migration is needed.
+* Assuming that no value is initialized with `C`, this is _not_ a migration.
 
-<!-- .element: class="fragment" -->
-
-- Assuming that no value is initialized with `C`, this is _not_ a migration.
-
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### When is a Migration Required?
 
@@ -154,20 +141,18 @@ pub enum Foo { A(u32), B(u32) }
 pub enum Foo { A(u32), C(u128), B(u32) }
 ```
 
-- You probably _never_ want to do this, but it is a migration.
+* You probably _never_ want to do this, but it is a migration.
 
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### 🦀 Rust Recall 🦀
 
 Enums are encoded as the variant enum, followed by the inner data:
 
-- The order matters! Both in `struct` and `enum`.
-- Enums that implement `Encode` cannot have more than 255 variants.
+* The order matters! Both in `struct` and `enum`.
+* Enums that implement `Encode` cannot have more than 255 variants.
 
----v
+\---v
 
 ### When is a Migration Required?
 
@@ -182,17 +167,11 @@ pub type FooValue = StorageValue<_, u32>;
 pub type BarValue = StorageValue<_, u32>;
 ```
 
-- So far everything is changing the _value_ format.<br />
+* So far everything is changing the _value_ format.\
 
-<div>
+* The _key_ changing is also a migration!
 
-- The _key_ changing is also a migration!
-
-</div>
-
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### When is a Migration Required?
 
@@ -208,46 +187,43 @@ pub type FooValue = StorageValue<_, u32>;
 pub type I_can_NOW_BE_renamEd_hahAA = StorageValue<_, u32>;
 ```
 
-- Handy macro if you must rename a storage type.<br />
-- This does _not_ require a migration.
+* Handy macro if you must rename a storage type.\
 
-<!-- .element: class="fragment" -->
+* This does _not_ require a migration.
 
----
+***
 
 ## Writing Runtime Migrations
 
-- Now that we know how to detect if a storage change is a **migration**, let's see how we write one.
+* Now that we know how to detect if a storage change is a **migration**, let's see how we write one.
 
----v
-
-### Writing Runtime Migrations
-
-- Once you upgrade a runtime, the code is expecting the data to be in a new format.
-- Any `on_initialize` or transaction might fail decoding data, and potentially `panic!`
-
----v
+\---v
 
 ### Writing Runtime Migrations
 
-- We need a **_hook_** that is executed **ONCE** as a part of the new runtime...
-- But before **ANY** other code (on_initialize, any transaction) with the new runtime is migrated.
+* Once you upgrade a runtime, the code is expecting the data to be in a new format.
+* Any `on_initialize` or transaction might fail decoding data, and potentially `panic!`
+
+\---v
+
+### Writing Runtime Migrations
+
+* We need a _**hook**_ that is executed **ONCE** as a part of the new runtime...
+* But before **ANY** other code (on\_initialize, any transaction) with the new runtime is migrated.
 
 > This is `OnRuntimeUpgrade`.
 
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### Writing Runtime Migrations
 
-- Optional activity: Go into `executive` and `system`, and find out how `OnRuntimeUpgrade` is called only when the code changes!
+* Optional activity: Go into `executive` and `system`, and find out how `OnRuntimeUpgrade` is called only when the code changes!
 
----
+***
 
 ## Pallet Internal Migrations
 
----v
+\---v
 
 ### Pallet Internal Migrations
 
@@ -264,13 +240,11 @@ impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
 
 > This approach is likely to be deprecated and is no longer practiced within Parity either.
 
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### Pallet Internal Migrations
 
-```rust [4-8]
+```rust
 #[pallet::hooks]
 impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
   fn on_runtime_upgrade() -> Weight {
@@ -283,15 +257,15 @@ impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
 }
 ```
 
-- If you execute `migrate_stuff_and_things_here_and_there` twice as well, then you are doomed 😫.
+* If you execute `migrate_stuff_and_things_here_and_there` twice as well, then you are doomed 😫.
 
----v
+\---v
 
 ### Pallet Internal Migrations
 
 **Historically**, something like this was used:
 
-```rust [1-7|9-19]
+```rust
 #[derive(Encode, Decode, ...)]
 enum StorageVersion {
   V1, V2, V3, // add a new variant with each version
@@ -313,11 +287,11 @@ impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
 }
 ```
 
----v
+\---v
 
 ### Pallet Internal Migrations
 
-- FRAME introduced macros to manage migrations: `#[pallet::storage_version]`.
+* FRAME introduced macros to manage migrations: `#[pallet::storage_version]`.
 
 ```rust
 // your current storage version.
@@ -328,7 +302,7 @@ const STORAGE_VERSION: StorageVersion = StorageVersion::new(2);
 pub struct Pallet<T>(_);
 ```
 
-- This adds two function to the `Pallet<_>` struct:
+* This adds two function to the `Pallet<_>` struct:
 
 ```rust
 // read the current version, encoded in the code.
@@ -339,7 +313,7 @@ Pallet::<T>::on_chain_storage_version();
 current.put::<Pallet<T>>();
 ```
 
----v
+\---v
 
 ### Pallet Internal Migrations
 
@@ -361,37 +335,35 @@ impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
 
 Stores the version as u16 in [`twox(pallet_name) ++ twox(:__STORAGE_VERSION__:)`](https://github.com/paritytech/polkadot-sdk/blob/c7c5fc7/substrate/frame/support/src/traits/metadata.rs#L163).
 
----
+***
 
 ## External Migrations
 
----v
+\---v
 
 ### External Migrations
 
-- Managing migrations within a pallet could be hard.
-- Especially for those that want to use external pallets.
+* Managing migrations within a pallet could be hard.
+* Especially for those that want to use external pallets.
 
 Alternative:
 
-- Every runtime can explicitly pass anything that implements `OnRuntimeUpgrade` to `Executive`.
-- End of the day, Executive does:
-  - `<(COnRuntimeUpgrade, AllPalletsWithSystem) as OnRuntimeUpgrade>::on_runtime_upgrade()`.
+* Every runtime can explicitly pass anything that implements `OnRuntimeUpgrade` to `Executive`.
+* End of the day, Executive does:
+  * `<(COnRuntimeUpgrade, AllPalletsWithSystem) as OnRuntimeUpgrade>::on_runtime_upgrade()`.
 
-<!-- .element: class="fragment" -->
-
----v
+\---v
 
 ### External Migrations
 
-- The main point of external migrations is making it more clear:
-- "_What migrations did exactly execute on upgrade to spec_version xxx_"
+* The main point of external migrations is making it more clear:
+* "_What migrations did exactly execute on upgrade to spec\_version xxx_"
 
----v
+\---v
 
 ### External Migrations
 
-- Expose your migration as a standalone function or struct implementing `OnRuntimeUpgrade` inside a `pub mod v<version_number>`.
+* Expose your migration as a standalone function or struct implementing `OnRuntimeUpgrade` inside a `pub mod v<version_number>`.
 
 ```rust
 pub mod v3 {
@@ -404,12 +376,12 @@ pub mod v3 {
 }
 ```
 
----v
+\---v
 
 ### External Migrations
 
-- Guard the code of the migration with `pallet::storage_version`
-- Don't forget to write the new version!
+* Guard the code of the migration with `pallet::storage_version`
+* Don't forget to write the new version!
 
 ```rust
 pub mod v3 {
@@ -429,11 +401,11 @@ pub mod v3 {
 }
 ```
 
----v
+\---v
 
 ### External Migrations
 
-- Pass it to the runtime per-release.
+* Pass it to the runtime per-release.
 
 ```rust
 pub type Executive = Executive<
@@ -446,62 +418,60 @@ pub type Executive = Executive<
 >;
 ```
 
----v
+\---v
 
 ### External Migrations
 
-- Discussion: Can the runtime upgrade scripts live forever? Or should they be removed after a few releases?
+* Discussion: Can the runtime upgrade scripts live forever? Or should they be removed after a few releases?
 
 Notes:
 
-Short answer is, yes, but it is a LOT of work. See here: <https://github.com/paritytech/polkadot-sdk/issues/296>
+Short answer is, yes, but it is a LOT of work. See here: [https://github.com/paritytech/polkadot-sdk/issues/296](https://github.com/paritytech/polkadot-sdk/issues/296)
 
----
+***
 
 ### Utilities in `frame-support`.
 
-- `translate` methods:
-  - For `StorageValue`, `StorageMap`, etc.
-- <https://paritytech.github.io/substrate/master/frame_support/storage/migration/index.html>
-
+* `translate` methods:
+  * For `StorageValue`, `StorageMap`, etc.
+* [https://paritytech.github.io/substrate/master/frame\_support/storage/migration/index.html](https://paritytech.github.io/substrate/master/frame_support/storage/migration/index.html)
 * `#[storage_alias]` macro to create storage types for removed for those that are being removed.
 
 Notes:
 
 Imagine you want to remove a storage map and in a migration you want to iterate it and delete all items. You want to remove this storage item, but it would be handy to be able to access it one last time in the migration code. This is where `#[storage_alias]` comes into play.
 
----
+***
 
 ## Case Studies
 
 1. The day we destroyed all balances in Polkadot.
-1. First ever migration ([`pallet-elections-phragmen`](https://github.com/paritytech/substrate/pull/3948)).
-1. Fairly independent migrations in `pallet-elections-phragmen`.
+2. First ever migration ([`pallet-elections-phragmen`](https://github.com/paritytech/substrate/pull/3948)).
+3. Fairly independent migrations in `pallet-elections-phragmen`.
 
----
+***
 
 ## Testing Upgrades
 
----v
+\---v
 
 ### Testing Upgrades
 
-- `try-runtime` + `RemoteExternalities` allow you to examine and test a runtime in detail with a high degree of control over the environment.
+* `try-runtime` + `RemoteExternalities` allow you to examine and test a runtime in detail with a high degree of control over the environment.
+* It is meant to try things out, and inspired by traits like `TryFrom`, the name `TryRuntime` was chosen.
 
-- It is meant to try things out, and inspired by traits like `TryFrom`, the name `TryRuntime` was chosen.
-
----v
+\---v
 
 ### Testing Upgrades
 
 Recall:
 
-- The runtime communicates with the client via host functions.
-- Moreover, the client communicates with the runtime via runtime APIs.
-- An environment that provides these host functions is called `Externalities`.
-- One example of which is `TestExternalities`, which you have already seen.
+* The runtime communicates with the client via host functions.
+* Moreover, the client communicates with the runtime via runtime APIs.
+* An environment that provides these host functions is called `Externalities`.
+* One example of which is `TestExternalities`, which you have already seen.
 
----v
+\---v
 
 ### Testing Upgrades: `remote-externalities`
 
@@ -521,57 +491,56 @@ let mut ext = Builder::<Block>::new()
 
 Reading all this data over RPC can be slow!
 
----v
+\---v
 
 ### Testing Upgrades: `remote-externalities`
 
 `remote-externalities` supports:
 
-- Custom prefixes -> Read a specific pallet
-- Injecting custom keys -> Read `:code:` as well.
-- Injecting custom key-values -> Overwrite `:code:` with `0x00`!
-- Reading child-tree data -> Relevant for crowdloan pallet etc.
-- Caching everything in disk for repeated use.
+* Custom prefixes -> Read a specific pallet
+* Injecting custom keys -> Read `:code:` as well.
+* Injecting custom key-values -> Overwrite `:code:` with `0x00`!
+* Reading child-tree data -> Relevant for crowdloan pallet etc.
+* Caching everything in disk for repeated use.
 
----v
+\---v
 
 ### Testing Upgrades: `remote-externalities`
 
 `remote-externalities` is in itself a very useful tool to:
 
-- Go back in time and re-running some code.
-- Write unit tests that work on the real-chain's state.
+* Go back in time and re-running some code.
+* Write unit tests that work on the real-chain's state.
 
----
+***
 
 ## Testing Upgrades: `try-runtime`
 
-- `try-runtime` is a CLI and a set of custom runtime APIs integrated in substrate that allows you to do detailed testing..
+* `try-runtime` is a CLI and a set of custom runtime APIs integrated in substrate that allows you to do detailed testing..
+* .. including running `OnRuntimeUpgrade` code of a new runtime, on top of a real chain's data.
 
-- .. including running `OnRuntimeUpgrade` code of a new runtime, on top of a real chain's data.
-
----v
-
-### Testing Upgrades: `try-runtime`
-
-- A lot can be said about it, the best resource is the [rust-docs](https://paritytech.github.io/substrate/master/try_runtime_cli/index.html).
-
----v
+\---v
 
 ### Testing Upgrades: `try-runtime`
 
-- You might find some code in your runtime that is featured gated with `#[cfg(feature = "try-runtime")]`. These are always for testing.
-- `pre_upgrade` and `post_upgrade`: Hooks executed before and after `on_runtime_upgrade`.
-- `try_state`: called in various other places, used to check the invariants the pallet.
+* A lot can be said about it, the best resource is the [rust-docs](https://paritytech.github.io/substrate/master/try_runtime_cli/index.html).
 
----v
+\---v
+
+### Testing Upgrades: `try-runtime`
+
+* You might find some code in your runtime that is featured gated with `#[cfg(feature = "try-runtime")]`. These are always for testing.
+* `pre_upgrade` and `post_upgrade`: Hooks executed before and after `on_runtime_upgrade`.
+* `try_state`: called in various other places, used to check the invariants the pallet.
+
+\---v
 
 ### Testing Upgrades: `try-runtime`: Live Demo.
 
-- Let's craft a migration on top of poor node-template 😈..
-- and migrate the balance type from u128 to u64.
+* Let's craft a migration on top of poor node-template 😈..
+* and migrate the balance type from u128 to u64.
 
----
+***
 
 ## Additional Resources 😋
 
@@ -579,12 +548,12 @@ Reading all this data over RPC can be slow!
 
 Notes:
 
-- Additional work on automatic version upgrades: <https://github.com/paritytech/substrate/issues/13107>
-- A Great talk about try-runtime and further testing of your runtime: <https://www.youtube.com/watch?v=a_u3KMG-n-I>
+* Additional work on automatic version upgrades: [https://github.com/paritytech/substrate/issues/13107](https://github.com/paritytech/substrate/issues/13107)
+* A Great talk about try-runtime and further testing of your runtime: [https://www.youtube.com/watch?v=a\_u3KMG-n-I](https://www.youtube.com/watch?v=a_u3KMG-n-I)
 
 #### Reference material:
 
-- 📺 [Substrate Seminar on Migrations](https://www.youtube.com/watch?v=MQgDV37JrIY>)
+* 📺 [Substrate Seminar on Migrations](https://www.youtube.com/watch?v=MQgDV37JrIY%3E)
 
 Notes:
 
@@ -592,9 +561,9 @@ FIXME: `docs.google.com/presentation/d/1hr3fiqOI0JlXw0ISs8uV9BXiDQ5mGOQLc3b_yWK6
 
 #### Exercise ideas:
 
-- Find the storage version of nomination pools pallet in Kusama.
-- Give them a poorly written migration code, and try and fix it. Things they need to fix:
-  - The migration depends on `<T: Config>`
-  - Does not manage version properly
-  - is hardcoded in the pallet.
-- Re-execute the block at which the runtime went OOM in May 25th 2021 Polkadot.
+* Find the storage version of nomination pools pallet in Kusama.
+* Give them a poorly written migration code, and try and fix it. Things they need to fix:
+  * The migration depends on `<T: Config>`
+  * Does not manage version properly
+  * is hardcoded in the pallet.
+* Re-execute the block at which the runtime went OOM in May 25th 2021 Polkadot.

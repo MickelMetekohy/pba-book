@@ -1,4 +1,4 @@
-# 🔐 Cryptography
+# Cryptography
 
 > “Cryptography rearranges power: it configures who can do what, from what”
 >
